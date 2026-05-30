@@ -590,6 +590,12 @@
         display: block;
       }
       
+      #print-cert .cert-supervisor {
+        font-size: 13pt;
+        color: var(--color-gray-700);
+        margin: 3mm 0;
+      }
+      
       #print-cert .cert-stage {
         font-size: 16pt;
         font-weight: 600;
@@ -634,7 +640,7 @@
         color: var(--color-gray-600);
       }
       
-      /* CHECKLIST PRINT LAYOUT - DISTINCT & CONCISE */
+      /* CHECKLIST PRINT LAYOUT - FULL DETAILS (Req #2) */
       #print-check {
         padding: 0;
         height: 95%;
@@ -661,18 +667,26 @@
         margin: 0;
       }
       
+      #print-check .check-meta {
+        font-size: 9pt;
+        color: var(--color-gray-600);
+        margin: 3mm 0 5mm;
+        text-align: center;
+      }
+      
       #print-check .check-items {
         display: flex;
         flex-direction: column;
-        gap: 2.5mm;
+        gap: 4mm;
       }
       
       #print-check .check-row {
         display: flex;
-        align-items: center;
-        padding: 2.5mm 0;
+        align-items: flex-start;
+        padding: 3mm 0;
         border-bottom: 1px dashed var(--color-gray-300);
-        font-size: 10pt;
+        font-size: 9.5pt;
+        page-break-inside: avoid;
       }
       
       #print-check .check-box {
@@ -680,6 +694,7 @@
         height: 5mm;
         border: 1.5px solid var(--color-gray-500);
         margin-left: 4mm;
+        margin-top: 1mm;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -694,41 +709,45 @@
         color: white;
       }
       
-      #print-check .check-title {
+      #print-check .check-content {
         flex: 1;
-        font-weight: 500;
+      }
+      
+      #print-check .check-title {
+        font-weight: 600;
+        color: var(--color-gray-900);
+        margin-bottom: 1.5mm;
+      }
+      
+      #print-check .check-desc {
+        font-size: 8.5pt;
+        color: var(--color-gray-600);
+        line-height: 1.4;
+      }
+      
+      #print-check .check-desc strong {
         color: var(--color-gray-800);
       }
       
       #print-check .check-type {
         font-size: 8pt;
         color: var(--color-gray-500);
-        width: 25mm;
-        text-align: left;
-        flex-shrink: 0;
+        margin-top: 2mm;
       }
       
       #print-check .check-footer {
-        margin-top: 6mm;
-        padding-top: 3mm;
-        border-top: 1px solid var(--color-gray-200);
+        margin-top: 8mm;
+        padding-top: 4mm;
+        border-top: 2px solid var(--color-gray-300);
         display: flex;
         justify-content: space-between;
-        font-size: 8pt;
-        color: var(--color-gray-500);
+        font-size: 8.5pt;
+        color: var(--color-gray-600);
       }
       
-      /* Hide non-essential elements in print */
-      #print-check .badge,
-      #print-check .check-desc,
-      #print-check .check-item strong span,
-      #print-check .text-gray-500 {
+      /* Hide badges in print for cleaner look */
+      #print-check .badge {
         display: none !important;
-      }
-      
-      /* Ensure no page breaks within items */
-      #print-check .check-row {
-        page-break-inside: avoid;
       }
     }
     
@@ -784,9 +803,76 @@
       background: rgba(59, 130, 246, 0.2);
       color: var(--color-gray-900);
     }
+    
+    /* Modal for trainee/supervisor names */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .modal-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--color-gray-800);
+    }
+    
+    .modal-input {
+      width: 100%;
+      padding: 0.625rem;
+      border: 1px solid var(--color-gray-300);
+      border-radius: var(--radius-md);
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+    }
+    
+    .modal-input:focus {
+      outline: 2px solid var(--color-secondary);
+      border-color: transparent;
+    }
+    
+    .modal-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
   </style>
 </head>
 <body class="min-h-screen">
+
+<!-- ============ MODAL FOR NAMES (Req #5) ============ -->
+<div id="print-modal" class="modal">
+  <div class="modal-content">
+    <h3 class="modal-title">📝 إدخال بيانات الطباعة</h3>
+    <input type="text" id="trainee-name" class="modal-input" placeholder="اسم المتدرب" maxlength="50">
+    <input type="text" id="supervisor-name" class="modal-input" placeholder="اسم المشرف" maxlength="50">
+    <div class="modal-actions">
+      <button onclick="closeModal()" class="btn btn-secondary btn-sm">إلغاء</button>
+      <button onclick="confirmPrint()" class="btn btn-primary btn-sm">طباعة</button>
+    </div>
+  </div>
+</div>
 
 <!-- ============ HEADER ============ -->
 <header class="bg-gradient-to-l from-emerald-700 to-emerald-600 text-white shadow-lg sticky top-0 z-50 no-print">
@@ -861,7 +947,7 @@
             <i class="fas fa-clipboard-list text-emerald-600 mb-1 block text-lg"></i>
             <div class="text-xs font-medium text-gray-800">قائمة العمليات</div>
           </button>
-          <button onclick="printChecklist()" class="p-3 bg-blue-50 hover:bg-blue-100 rounded-lg text-center transition border border-blue-200">
+          <button onclick="openPrintModal('checklist')" class="p-3 bg-blue-50 hover:bg-blue-100 rounded-lg text-center transition border border-blue-200">
             <i class="fas fa-print text-blue-600 mb-1 block text-lg"></i>
             <div class="text-xs font-medium text-gray-800">طباعة القائمة</div>
           </button>
@@ -1221,22 +1307,22 @@
             
             <h3 class="font-bold text-gray-800 mb-4">🎓 طباعة الشهادات المعتمدة</h3>
             <div class="grid md:grid-cols-2 gap-4 mb-6">
-              <button onclick="printCertificate(1)" class="p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition text-right">
+              <button onclick="openPrintModal('certificate', 1)" class="p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition text-right">
                 <i class="fas fa-certificate text-blue-600 mb-2 block text-xl"></i>
                 <div class="font-medium text-gray-800">شهادة المرحلة 1</div>
                 <div class="text-xs text-gray-500">أساسيات اللوائح</div>
               </button>
-              <button onclick="printCertificate(2)" class="p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition text-right">
+              <button onclick="openPrintModal('certificate', 2)" class="p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition text-right">
                 <i class="fas fa-certificate text-green-600 mb-2 block text-xl"></i>
                 <div class="font-medium text-gray-800">شهادة المرحلة 2</div>
                 <div class="text-xs text-gray-500">ضوابط التأشيرات</div>
               </button>
-              <button onclick="printCertificate(3)" class="p-4 bg-amber-50 hover:bg-amber-100 rounded-lg border border-amber-200 transition text-right">
+              <button onclick="openPrintModal('certificate', 3)" class="p-4 bg-amber-50 hover:bg-amber-100 rounded-lg border border-amber-200 transition text-right">
                 <i class="fas fa-certificate text-amber-600 mb-2 block text-xl"></i>
                 <div class="font-medium text-gray-800">شهادة المرحلة 3</div>
                 <div class="text-xs text-gray-500">الحقوق والتسوية</div>
               </button>
-              <button onclick="printCertificate(4)" class="p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition text-right">
+              <button onclick="openPrintModal('certificate', 4)" class="p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition text-right">
                 <i class="fas fa-certificate text-red-600 mb-2 block text-xl"></i>
                 <div class="font-medium text-gray-800">شهادة المرحلة 4</div>
                 <div class="text-xs text-gray-500">السيناريوهات المتقدمة</div>
@@ -1270,12 +1356,12 @@
           </div>
           <div class="card-body">
 
-            <!-- Filter Tabs -->
+            <!-- Filter Tabs (Req #4 Fix) -->
             <div class="flex flex-wrap gap-2 mb-4 border-b pb-3 no-print">
-              <button onclick="filterChecklist('all')" class="tab-btn active px-4 py-2 text-sm font-medium rounded-lg bg-emerald-600 text-white">الكل</button>
-              <button onclick="filterChecklist('mandatory')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-red-100 text-red-800 hover:bg-red-200">إلزامي ⚠️</button>
-              <button onclick="filterChecklist('recommended')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-amber-100 text-amber-800 hover:bg-amber-200">موصى به 💡</button>
-              <button onclick="filterChecklist('info')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-200">معلومات ℹ️</button>
+              <button onclick="filterChecklist('all', this)" class="tab-btn active px-4 py-2 text-sm font-medium rounded-lg bg-emerald-600 text-white">الكل</button>
+              <button onclick="filterChecklist('mandatory', this)" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-red-100 text-red-800 hover:bg-red-200">إلزامي ⚠️</button>
+              <button onclick="filterChecklist('recommended', this)" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-amber-100 text-amber-800 hover:bg-amber-200">موصى به 💡</button>
+              <button onclick="filterChecklist('info', this)" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-200">معلومات ℹ️</button>
             </div>
 
             <!-- Checklist Items with Detailed Descriptions -->
@@ -1516,7 +1602,7 @@
             </div>
 
             <div class="flex flex-wrap gap-3 no-print">
-              <button onclick="printChecklist()" class="flex-1 btn btn-primary">
+              <button onclick="openPrintModal('checklist')" class="flex-1 btn btn-primary">
                 <i class="fas fa-print"></i>
                 طباعة القائمة (صفحة واحدة)
               </button>
@@ -1563,6 +1649,7 @@
     <div class="cert-body">
       <p>تشهد منصة مساند بأن:</p>
       <span class="cert-name" id="print-cert-name">اسم المتدرب المعتمد</span>
+      <p class="cert-supervisor" id="print-cert-supervisor">تحت إشراف: —</p>
       <p>قد أتم بنجاح</p>
       <p class="cert-stage" id="print-cert-stage">المرحلة رقم: <strong>—</strong></p>
       <p class="cert-stage-title" id="print-cert-title">عنوان المرحلة</p>
@@ -1591,7 +1678,7 @@
   </div>
 </div>
 
-<!-- Checklist Print Container - DISTINCT & CONCISE LAYOUT -->
+<!-- Checklist Print Container - FULL DETAILS LAYOUT (Req #2) -->
 <div id="print-check" class="print-overlay">
   <div class="print-page">
     <div class="check-header">
@@ -1599,8 +1686,12 @@
       <p class="check-date" id="print-check-date">__ / __ / ____</p>
     </div>
     
+    <div class="check-meta">
+      <p>المتدرب: <span id="print-check-trainee">—</span> | المشرف: <span id="print-check-supervisor">—</span></p>
+    </div>
+    
     <div class="check-items" id="print-check-items">
-      <!-- Items injected by JS -->
+      <!-- Items injected by JS with full details -->
     </div>
     
     <div class="check-footer">
@@ -1720,7 +1811,12 @@ let state = {
   stageScores: JSON.parse(localStorage.getItem('musaned_scores')) || {},
   stageAnswers: JSON.parse(localStorage.getItem('musaned_answers')) || {},
   opsChecklist: JSON.parse(localStorage.getItem('musaned_ops')) || {},
-  fontSize: parseInt(localStorage.getItem('musaned_fontSize')) || 16
+  fontSize: parseInt(localStorage.getItem('musaned_fontSize')) || 16,
+  traineeName: localStorage.getItem('musaned_traineeName') || '',
+  supervisorName: localStorage.getItem('musaned_supervisorName') || '',
+  printType: null,
+  printStage: null,
+  isPrinting: false  // Req #1: Prevent duplicate prints
 };
 
 // ============ INITIALIZATION ============
@@ -1729,6 +1825,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const today = new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   document.getElementById('currentDate').textContent = today;
   document.getElementById('print-check-date').textContent = today;
+  
+  // Load saved names (Req #5)
+  if (state.traineeName) document.getElementById('trainee-name').value = state.traineeName;
+  if (state.supervisorName) document.getElementById('supervisor-name').value = state.supervisorName;
   
   // Apply font size
   applyFontSize();
@@ -1747,6 +1847,44 @@ document.addEventListener('DOMContentLoaded', () => {
   loadOpsChecklist();
 });
 
+// ============ MODAL FUNCTIONS (Req #5) ============
+function openPrintModal(type, stage = null) {
+  state.printType = type;
+  state.printStage = stage;
+  
+  // Pre-fill modal with saved names
+  document.getElementById('trainee-name').value = state.traineeName;
+  document.getElementById('supervisor-name').value = state.supervisorName;
+  
+  document.getElementById('print-modal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('print-modal').classList.remove('active');
+  state.printType = null;
+  state.printStage = null;
+}
+
+function confirmPrint() {
+  // Save names (Req #5)
+  state.traineeName = document.getElementById('trainee-name').value.trim() || 'اسم المتدرب';
+  state.supervisorName = document.getElementById('supervisor-name').value.trim() || 'اسم المشرف';
+  localStorage.setItem('musaned_traineeName', state.traineeName);
+  localStorage.setItem('musaned_supervisorName', state.supervisorName);
+  
+  closeModal();
+  
+  // Trigger print
+  if (state.printType === 'certificate' && state.printStage) {
+    printCertificate(state.printStage);
+  } else if (state.printType === 'checklist') {
+    printChecklist();
+  }
+  
+  state.printType = null;
+  state.printStage = null;
+}
+
 // ============ FONT SIZE CONTROL (Req #4) ============
 function changeFontSize(direction) {
   let newSize = state.fontSize;
@@ -1756,7 +1894,6 @@ function changeFontSize(direction) {
   } else if (direction === 1) {
     newSize = Math.min(22, state.fontSize + 1.5);
   }
-  // direction === 0 keeps current size
   
   state.fontSize = newSize;
   localStorage.setItem('musaned_fontSize', newSize);
@@ -1777,27 +1914,51 @@ function applyFontSize() {
   document.documentElement.style.setProperty('--base-font', state.fontSize + 'px');
 }
 
-// ============ VIEW & NAVIGATION ============
+// ============ VIEW & NAVIGATION (Req #3 Fix) ============
 function toggleView() {
   state.currentView = state.currentView === 'training' ? 'operations' : 'training';
   
-  document.getElementById('trainingView').classList.toggle('hidden', state.currentView === 'operations');
-  document.getElementById('operationsView').classList.toggle('hidden', state.currentView === 'training');
-  document.getElementById('trainingNav').classList.toggle('hidden', state.currentView === 'operations');
-  document.getElementById('opsNav').classList.toggle('hidden', state.currentView === 'training');
+  // Toggle visibility with proper display handling
+  const trainingView = document.getElementById('trainingView');
+  const operationsView = document.getElementById('operationsView');
+  const trainingNav = document.getElementById('trainingNav');
+  const opsNav = document.getElementById('opsNav');
   
-  document.getElementById('viewToggleText').textContent = state.currentView === 'training' ? 'عرض العمليات' : 'عرض التدريب';
+  if (state.currentView === 'training') {
+    trainingView.classList.remove('hidden');
+    operationsView.classList.add('hidden');
+    trainingNav.classList.remove('hidden');
+    opsNav.classList.add('hidden');
+    document.getElementById('viewToggleText').textContent = 'عرض العمليات';
+  } else {
+    trainingView.classList.add('hidden');
+    operationsView.classList.remove('hidden');
+    trainingNav.classList.add('hidden');
+    opsNav.classList.remove('hidden');
+    document.getElementById('viewToggleText').textContent = 'عرض التدريب';
+  }
   
-  // Update mobile tabs
-  document.getElementById('tab-training').classList.toggle('active', state.currentView === 'training');
-  document.getElementById('tab-training').setAttribute('aria-selected', state.currentView === 'training');
-  document.getElementById('tab-training').classList.toggle('border-emerald-600', state.currentView === 'training');
-  document.getElementById('tab-training').classList.toggle('border-transparent', state.currentView !== 'training');
+  // Update mobile tabs with proper aria attributes
+  const tabTraining = document.getElementById('tab-training');
+  const tabOperations = document.getElementById('tab-operations');
   
-  document.getElementById('tab-operations').classList.toggle('active', state.currentView === 'operations');
-  document.getElementById('tab-operations').setAttribute('aria-selected', state.currentView === 'operations');
-  document.getElementById('tab-operations').classList.toggle('border-emerald-600', state.currentView === 'operations');
-  document.getElementById('tab-operations').classList.toggle('border-transparent', state.currentView !== 'operations');
+  if (state.currentView === 'training') {
+    tabTraining.classList.add('active', 'border-emerald-600');
+    tabTraining.classList.remove('border-transparent');
+    tabTraining.setAttribute('aria-selected', 'true');
+    
+    tabOperations.classList.remove('active', 'border-emerald-600');
+    tabOperations.classList.add('border-transparent');
+    tabOperations.setAttribute('aria-selected', 'false');
+  } else {
+    tabOperations.classList.add('active', 'border-emerald-600');
+    tabOperations.classList.remove('border-transparent');
+    tabOperations.setAttribute('aria-selected', 'true');
+    
+    tabTraining.classList.remove('active', 'border-emerald-600');
+    tabTraining.classList.add('border-transparent');
+    tabTraining.setAttribute('aria-selected', 'false');
+  }
 }
 
 function switchTab(view) {
@@ -1810,7 +1971,7 @@ function switchTab(view) {
 }
 
 function showModule(moduleId) {
-  // Hide all modules
+  // Hide all modules properly
   document.querySelectorAll('.module-content').forEach(el => {
     el.classList.remove('active');
     el.classList.remove('certificate-print');
@@ -2196,7 +2357,8 @@ function loadOpsChecklist() {
   updateOpsProgress();
 }
 
-function filterChecklist(category) {
+// Req #4 Fix: Use currentTarget instead of event.target
+function filterChecklist(category, btn) {
   document.querySelectorAll('.ops-checklist .check-item').forEach(item => {
     if (category === 'all' || item.dataset.category === category) {
       item.style.display = 'block';
@@ -2205,13 +2367,16 @@ function filterChecklist(category) {
     }
   });
   
-  // Update tab active state
-  document.querySelectorAll('[onclick^="filterChecklist"]').forEach(btn => {
-    btn.classList.remove('active', 'bg-emerald-600', 'text-white');
-    btn.classList.add('bg-gray-100', 'text-gray-700');
+  // Update tab active state using passed btn parameter
+  document.querySelectorAll('[onclick^="filterChecklist"]').forEach(b => {
+    b.classList.remove('active', 'bg-emerald-600', 'text-white');
+    b.classList.add('bg-gray-100', 'text-gray-700');
   });
-  event.target.classList.add('active', 'bg-emerald-600', 'text-white');
-  event.target.classList.remove('bg-gray-100', 'text-gray-700');
+  
+  if (btn) {
+    btn.classList.add('active', 'bg-emerald-600', 'text-white');
+    btn.classList.remove('bg-gray-100', 'text-gray-700');
+  }
 }
 
 function updateOpsProgress() {
@@ -2241,8 +2406,13 @@ function resetDailyChecklist() {
   }
 }
 
-// ============ PRINT FUNCTIONS (Req #2 & #3) ============
+// ============ PRINT FUNCTIONS (Req #1, #2, #3, #5) ============
+
+// Req #1 Fix: Prevent duplicate prints with flag and proper timing
 function triggerPrint(containerId) {
+  if (state.isPrinting) return;
+  state.isPrinting = true;
+  
   // Hide all overlays
   document.querySelectorAll('.print-overlay').forEach(el => el.classList.remove('active'));
   
@@ -2250,15 +2420,19 @@ function triggerPrint(containerId) {
   const overlay = document.getElementById(containerId);
   overlay.classList.add('active');
   
+  // Focus window to ensure print dialog appears
+  window.focus();
+  
   // Trigger print after short delay
   setTimeout(() => {
     window.print();
-  }, 100);
-  
-  // Cleanup after print dialog closes
-  setTimeout(() => {
-    overlay.classList.remove('active');
-  }, 1000);
+    
+    // Cleanup after print dialog closes
+    setTimeout(() => {
+      overlay.classList.remove('active');
+      state.isPrinting = false;
+    }, 500);
+  }, 150);
 }
 
 function printCertificate(stageNum) {
@@ -2266,8 +2440,9 @@ function printCertificate(stageNum) {
   const score = state.stageScores[stageNum] || 0;
   const total = quizQuestions[stageNum].length;
   
-  // Populate certificate data
-  document.getElementById('print-cert-name').textContent = 'اسم المتدرب المعتمد';
+  // Populate certificate data with names (Req #5)
+  document.getElementById('print-cert-name').textContent = state.traineeName || 'اسم المتدرب المعتمد';
+  document.getElementById('print-cert-supervisor').textContent = `تحت إشراف: ${state.supervisorName || 'اسم المشرف'}`;
   document.getElementById('print-cert-stage').innerHTML = `المرحلة <strong>${stageNum}</strong>`;
   document.getElementById('print-cert-title').textContent = stage.title;
   document.getElementById('print-cert-score').textContent = `${score}/${total}`;
@@ -2278,24 +2453,32 @@ function printCertificate(stageNum) {
   triggerPrint('print-cert');
 }
 
+// Req #2 Fix: Print checklist WITH full details
 function printChecklist() {
-  // Build concise print version (Req #2 & #3)
   const items = document.querySelectorAll('#opsChecklistContainer .check-item');
   const printContainer = document.getElementById('print-check-items');
   printContainer.innerHTML = '';
   
+  // Populate names (Req #5)
+  document.getElementById('print-check-trainee').textContent = state.traineeName || '—';
+  document.getElementById('print-check-supervisor').textContent = state.supervisorName || '—';
+  
   items.forEach((item, idx) => {
     const checkbox = item.querySelector('input[type="checkbox"]');
-    const label = item.querySelector('label strong').textContent;
+    const label = item.querySelector('label strong');
+    const desc = item.querySelector('.check-desc');
     const category = item.dataset.category;
-    const typeIcon = category === 'mandatory' ? '⚠️' : category === 'recommended' ? '💡' : 'ℹ️';
+    const typeLabel = category === 'mandatory' ? '⚠️ إلزامي' : category === 'recommended' ? '💡 موصى به' : 'ℹ️ معلومات';
     
     const row = document.createElement('div');
     row.className = 'check-row';
     row.innerHTML = `
       <div class="check-box ${checkbox.checked ? 'checked' : ''}">${checkbox.checked ? '✓' : ''}</div>
-      <span class="check-title">${idx + 1}. ${label.replace(/\[.*?\]\s*/, '')}</span>
-      <span class="check-type">${typeIcon}</span>
+      <div class="check-content">
+        <div class="check-title">${idx + 1}. ${label.textContent}</div>
+        <div class="check-desc">${desc.innerHTML}</div>
+        <div class="check-type">${typeLabel}</div>
+      </div>
     `;
     printContainer.appendChild(row);
   });
@@ -2305,7 +2488,7 @@ function printChecklist() {
   const total = document.querySelectorAll('#opsChecklistContainer input').length;
   document.getElementById('print-check-pct').textContent = `${Math.round(checked/total*100)}%`;
   
-  // Trigger print with distinct checklist layout (Req #2 & #3)
+  // Trigger print with full-details checklist layout (Req #2 & #3)
   triggerPrint('print-check');
 }
 

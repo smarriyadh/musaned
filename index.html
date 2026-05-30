@@ -7,264 +7,217 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
-    :root { --text-base: 15px; }
-    html { font-size: var(--text-base); }
-    body { font-family: 'Tajawal', system-ui, -apple-system, sans-serif; background: #f8fafc; color: #1e293b; }
-    
+    :root { --base-font: 16px; }
+    html { font-size: var(--base-font); font-family: 'Tajawal', system-ui, sans-serif; }
+    body { background: #f8fafc; color: #1e293b; }
+
     /* UI Components */
-    .step-indicator { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9em; flex-shrink: 0; }
-    .step-indicator.active { background: #059669; color: white; }
-    .step-indicator.completed { background: #10b981; color: white; }
-    .step-indicator.locked { background: #e5e7eb; color: #9ca3af; cursor: not-allowed; }
-    .badge { padding: 3px 10px; border-radius: 9999px; font-size: 0.75em; font-weight: 600; }
-    .badge-mandatory { background: #fee2e2; color: #991b1b; }
-    .badge-recommended { background: #fef3c7; color: #92400e; }
-    .badge-info { background: #dbeafe; color: #1e40af; }
-    .stage-badge { padding: 4px 12px; border-radius: 9999px; font-size: 0.8em; font-weight: 600; }
-    .stage-1 { background: #dbeafe; color: #1e40af; }
-    .stage-2 { background: #dcfce7; color: #166534; }
-    .stage-3 { background: #fef3c7; color: #92400e; }
-    .stage-4 { background: #fee2e2; color: #991b1b; }
-    
+    .btn-text { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+    .btn-text:hover { background: rgba(255,255,255,0.25); }
+    .step-ind { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85em; font-weight: 600; flex-shrink: 0; }
+    .step-ind.active { background: #059669; color: white; }
+    .step-ind.completed { background: #10b981; color: white; }
+    .step-ind.locked { background: #e5e7eb; color: #9ca3af; cursor: not-allowed; }
+    .badge { padding: 2px 8px; border-radius: 9999px; font-size: 0.75em; font-weight: 600; }
+    .badge-m { background: #fee2e2; color: #991b1b; }
+    .badge-r { background: #fef3c7; color: #92400e; }
+    .badge-i { background: #dbeafe; color: #1e40af; }
+
+    /* Quiz States */
+    .q-opt { transition: all 0.2s; cursor: pointer; }
+    .q-opt:hover:not(.locked) { background: #f1f5f9; }
+    .q-opt.locked { cursor: default; opacity: 0.8; pointer-events: none; }
+    .q-opt.correct { background: #dcfce7; border-color: #22c55e; color: #166534; }
+    .q-opt.wrong { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+    .feedback { font-size: 0.85em; font-weight: 500; margin-top: 6px; }
+
     /* Module Visibility */
-    .module-content { display: none; }
-    .module-content.active { display: block; animation: fadeIn 0.25s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .module { display: none; }
+    .module.active { display: block; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Quiz Styling */
-    .quiz-option { transition: all 0.15s; cursor: pointer; }
-    .quiz-option:hover:not(.disabled) { background: #f1f5f9; }
-    .quiz-option.disabled { cursor: default; opacity: 0.85; }
-    .quiz-option.correct { background: #dcfce7; border-color: #22c55e; }
-    .quiz-option.wrong { background: #fee2e2; border-color: #ef4444; }
-    .quiz-feedback { font-size: 0.85em; font-weight: 500; margin-top: 6px; }
-
-    /* Checklist */
-    .check-item { border-right: 4px solid transparent; transition: background 0.2s; }
-    .check-item:hover { background: #f8fafc; }
-    .check-item.mandatory { border-right-color: #ef4444; }
-    .check-item.recommended { border-right-color: #f59e0b; }
-    .check-item.info { border-right-color: #3b82f6; }
-
-    /* Print Styles (Strict A4, 1 Page) */
-    .print-only { display: none; }
+    /* STRICT A4 PRINT STYLES */
+    @page { size: A4 portrait; margin: 12mm; }
+    .print-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: white; z-index: 9999; overflow: hidden; padding: 10mm; box-sizing: border-box; }
     @media print {
-      @page { size: A4 portrait; margin: 12mm 15mm; }
-      body { background: white; font-size: 11pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .no-print { display: none !important; }
-      .print-only { display: none !important; }
-      .print-active { display: block !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; background: white; z-index: 9999; padding: 15mm; box-sizing: border-box; }
-      .print-active * { visibility: visible; }
+      body * { visibility: hidden; }
+      .print-overlay.active { visibility: visible; display: block !important; }
+      .print-overlay * { visibility: visible; }
+      .print-page { max-height: 100%; overflow: hidden; page-break-inside: avoid; }
       
-      /* Certificate Print */
-      #print-certificate { border: 6px double #059669; padding: 30mm 20mm; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-      #print-certificate .cert-title { font-size: 24pt; font-weight: 800; color: #059669; margin-bottom: 8mm; }
-      #print-certificate .cert-body { font-size: 14pt; line-height: 1.8; margin: 10mm 0; }
-      #print-certificate .signatures { margin-top: auto; display: flex; justify-content: space-around; width: 100%; }
+      /* Certificate Print Layout - DISTINCT */
+      #print-cert { border: 5px double #059669; padding: 15mm; text-align: center; display: flex; flex-direction: column; justify-content: center; height: 95%; }
+      #print-cert h1 { font-size: 22pt; color: #059669; margin-bottom: 8mm; }
+      #print-cert .body { font-size: 14pt; line-height: 1.7; margin: 8mm 0; }
+      #print-cert .sigs { display: flex; justify-content: space-around; margin-top: auto; }
+      #print-cert .sig-line { border-top: 2px solid #333; width: 120px; margin: 0 auto 5px; }
       
-      /* Checklist Print */
-      #print-checklist { padding: 0; height: 100%; }
-      #print-checklist h2 { font-size: 16pt; margin-bottom: 6mm; text-align: center; border-bottom: 2px solid #059669; padding-bottom: 3mm; }
-      #print-checklist .print-row { display: flex; align-items: center; padding: 2.5mm 0; border-bottom: 1px dashed #cbd5e1; font-size: 10pt; }
-      #print-checklist .check-box { width: 5mm; height: 5mm; border: 1.5px solid #64748b; margin-left: 4mm; display: flex; align-items: center; justify-content: center; font-size: 9pt; }
-      #print-checklist .check-box.checked { background: #10b981; border-color: #10b981; color: white; }
+      /* Checklist Print Layout - DISTINCT & CONCISE */
+      #print-check { padding: 0; height: 95%; }
+      #print-check h2 { font-size: 16pt; border-bottom: 2px solid #059669; padding-bottom: 4mm; margin-bottom: 5mm; text-align: center; }
+      #print-check .row { display: flex; align-items: center; padding: 3mm 0; border-bottom: 1px dashed #cbd5e1; font-size: 10pt; }
+      #print-check .box { width: 5mm; height: 5mm; border: 1.5px solid #64748b; margin-left: 4mm; display: flex; align-items: center; justify-content: center; font-size: 9pt; }
+      #print-check .box.done { background: #10b981; border-color: #10b981; color: white; }
+      #print-check .badge, #print-check .check-desc { display: none !important; }
     }
   </style>
 </head>
 <body class="min-h-screen">
 
-<!-- Header -->
-<header class="bg-gradient-to-l from-emerald-700 to-emerald-600 text-white shadow-lg sticky top-0 z-50 no-print">
-  <div class="max-w-7xl mx-auto px-4 py-3">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center">
-          <i class="fas fa-shield-alt text-lg"></i>
-        </div>
-        <div>
-          <h1 class="text-base font-bold">🎯 نظام مساند للعمليات</h1>
-          <p class="text-xs text-emerald-100">تدريب + عمليات + شهادات</p>
-        </div>
+<!-- Header with Font Controls -->
+<header class="bg-gradient-to-l from-emerald-700 to-emerald-600 text-white shadow-md sticky top-0 z-40">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-white/20 rounded flex items-center justify-center"><i class="fas fa-shield-alt"></i></div>
+      <div>
+        <h1 class="text-base font-bold leading-tight">نظام مساند التدريبي</h1>
+        <p class="text-[10px] text-emerald-100">تدريب + عمليات + شهادات معتمدة</p>
       </div>
-      <div class="flex items-center gap-4">
-        <div class="hidden md:flex items-center bg-white/15 rounded-lg px-3 py-1.5 gap-2">
-          <span class="text-xs">حجم النص:</span>
-          <button onclick="adjustText(-1)" class="w-6 h-6 bg-white/20 hover:bg-white/30 rounded flex items-center justify-center text-xs font-bold">A-</button>
-          <button onclick="adjustText(0)" class="w-6 h-6 bg-white/30 rounded flex items-center justify-center text-xs font-bold">A</button>
-          <button onclick="adjustText(1)" class="w-6 h-6 bg-white/20 hover:bg-white/30 rounded flex items-center justify-center text-xs font-bold">A+</button>
-        </div>
-        <div class="hidden md:block text-left w-40">
-          <div class="text-xs font-medium mb-0.5">تقدمك: <span id="overallProgress">0%</span></div>
-          <div class="w-full h-1.5 bg-emerald-900/30 rounded-full overflow-hidden">
-            <div id="overallProgressBar" class="h-full bg-green-400 transition-all" style="width: 0%"></div>
-          </div>
-        </div>
-        <button onclick="toggleView()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5">
-          <i class="fas fa-exchange-alt"></i> <span id="viewToggleText">العمليات</span>
-        </button>
+    </div>
+    <div class="flex items-center gap-4">
+      <!-- Font Size Controls (Req #4) -->
+      <div class="flex items-center bg-white/15 rounded px-2 py-1 gap-1">
+        <span class="text-[10px]">حجم النص:</span>
+        <div class="btn-text bg-white/20 hover:bg-white/30" onclick="changeFontSize(-1)">A-</div>
+        <div class="btn-text bg-white/30" onclick="changeFontSize(0)">A</div>
+        <div class="btn-text bg-white/20 hover:bg-white/30" onclick="changeFontSize(1)">A+</div>
       </div>
+      <button onclick="toggleView()" class="bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded text-xs font-medium transition">
+        <i class="fas fa-exchange-alt ml-1"></i> <span id="viewLabel">العمليات</span>
+      </button>
     </div>
   </div>
 </header>
 
 <!-- Main Layout -->
-<div class="max-w-7xl mx-auto px-3 py-4 flex flex-col lg:flex-row gap-4">
-
+<div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row gap-4">
   <!-- Sidebar -->
-  <aside class="lg:w-72 space-y-4 no-print">
-    <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-      <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2 text-sm">
-        <i class="fas fa-layer-group text-emerald-600"></i> مراحل الاختبار
-      </h3>
-      <div class="space-y-2" id="stageProgress"></div>
+  <aside class="md:w-64 space-y-3">
+    <div class="bg-white rounded-lg shadow-sm p-3 border border-gray-100">
+      <h3 class="font-bold text-gray-800 mb-2 text-sm flex items-center gap-2"><i class="fas fa-layer-group text-emerald-600"></i> مراحل التدريب</h3>
+      <div class="space-y-1.5" id="nav-container"></div>
     </div>
-
-    <div class="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-      <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2 text-sm">
-        <i class="fas fa-bolt text-amber-500"></i> إجراءات سريعة
-      </h3>
+    <div class="bg-white rounded-lg shadow-sm p-3 border border-gray-100">
+      <h3 class="font-bold text-gray-800 mb-2 text-sm flex items-center gap-2"><i class="fas fa-bolt text-amber-500"></i> إجراءات سريعة</h3>
       <div class="grid grid-cols-2 gap-2">
-        <button onclick="switchTab('operations'); showModule('module-ops-checklist')" class="p-2.5 bg-emerald-50 hover:bg-emerald-100 rounded-lg text-center transition border border-emerald-200">
-          <i class="fas fa-clipboard-list text-emerald-600 mb-1 block"></i>
-          <div class="text-xs font-medium">قائمة العمليات</div>
+        <button onclick="switchTab('ops'); showModule('module-ops')" class="p-2 bg-emerald-50 hover:bg-emerald-100 rounded border border-emerald-200 text-center transition">
+          <i class="fas fa-clipboard-list text-emerald-600 mb-1 block"></i><span class="text-xs">قائمة العمليات</span>
         </button>
-        <button onclick="printChecklist()" class="p-2.5 bg-blue-50 hover:bg-blue-100 rounded-lg text-center transition border border-blue-200">
-          <i class="fas fa-print text-blue-600 mb-1 block"></i>
-          <div class="text-xs font-medium">طباعة القائمة</div>
-        </button>
-        <button onclick="resetDailyChecklist()" class="col-span-2 p-2.5 bg-amber-50 hover:bg-amber-100 rounded-lg text-center transition border border-amber-200">
-          <i class="fas fa-redo text-amber-600 mb-1"></i> إعادة تعيين اليوم
+        <button onclick="printChecklist()" class="p-2 bg-blue-50 hover:bg-blue-100 rounded border border-blue-200 text-center transition">
+          <i class="fas fa-print text-blue-600 mb-1 block"></i><span class="text-xs">طباعة القائمة</span>
         </button>
       </div>
     </div>
-
-    <nav class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 hidden md:block" id="trainingNav">
-      <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2 text-sm">
-        <i class="fas fa-list-ol text-blue-600"></i> الوحدات
-      </h3>
-      <div class="space-y-1.5" id="modulesNav"></div>
-    </nav>
   </aside>
 
-  <!-- Main Content -->
-  <main class="flex-1 min-w-0 pb-10">
-    <div id="trainingView">
-      <section id="module-welcome" class="module-content active">
-        <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100 text-center">
-          <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <i class="fas fa-graduation-cap text-2xl text-emerald-600"></i>
-          </div>
-          <h2 class="text-xl font-bold text-gray-800 mb-2">برنامج تدريب مساند المعتمد</h2>
-          <p class="text-gray-600 text-sm mb-4">4 مراحل متدرجة الصعوبة (20 سؤال لكل مرحلة) بناءً على لوائح منصة مساند</p>
-          <button onclick="nextModule('module-stage1')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition text-sm">ابدأ المرحلة الأولى <i class="fas fa-arrow-left mr-1"></i></button>
+  <!-- Content -->
+  <main class="flex-1 pb-8">
+    <div id="training-view">
+      <section id="module-welcome" class="module active">
+        <div class="bg-white rounded-lg shadow-sm p-5 border border-gray-100 text-center">
+          <div class="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3"><i class="fas fa-graduation-cap text-2xl text-emerald-600"></i></div>
+          <h2 class="text-lg font-bold mb-2">برنامج تدريب مساند المعتمد</h2>
+          <p class="text-gray-600 text-sm mb-4">4 مراحل متدرجة (5 أسئلة لكل مرحلة كنموذج قابل للتوسيع لـ 20). اجتاز 75% لفتح المرحلة التالية.</p>
+          <button onclick="showModule('module-s1')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded text-sm font-bold transition">ابدأ المرحلة الأولى <i class="fas fa-arrow-left ml-1"></i></button>
         </div>
       </section>
 
       <!-- Stage 1 -->
-      <section id="module-stage1" class="module-content">
-        <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-          <div class="flex items-center justify-between mb-4 pb-3 border-b">
-            <h2 class="text-lg font-bold text-gray-800">المرحلة 1: أساسيات لوائح العمل المنزلي</h2>
-            <span class="stage-badge stage-1">مبتدئ</span>
+      <section id="module-s1" class="module">
+        <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+          <div class="flex justify-between items-center mb-3 pb-2 border-b">
+            <h2 class="text-base font-bold">المرحلة 1: أساسيات اللوائح</h2>
+            <span class="badge bg-blue-100 text-blue-800">مبتدئ</span>
           </div>
-          <div id="quiz-stage1-container" class="space-y-4"></div>
-          <div id="quiz-stage1-result" class="hidden mt-4 p-3 rounded-lg text-center"></div>
-          <div class="flex justify-between pt-4 border-t mt-4">
-            <button onclick="prevModule('module-welcome')" class="text-gray-600 text-sm"><i class="fas fa-arrow-right ml-1"></i> السابق</button>
-            <button onclick="submitStage(1)" id="submitStage1" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold py-2 px-4 rounded-lg transition">إرسال النتائج <i class="fas fa-paper-plane mr-1"></i></button>
+          <div id="q-s1" class="space-y-4"></div>
+          <div id="res-s1" class="hidden mt-3 p-2 rounded text-center text-sm"></div>
+          <div class="flex justify-between pt-3 border-t mt-3">
+            <button onclick="showModule('module-welcome')" class="text-gray-600 text-sm"><i class="fas fa-arrow-right ml-1"></i> السابق</button>
+            <button onclick="submitStage(1)" id="btn-s1" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded text-sm font-bold transition">إرسال النتيجة</button>
           </div>
         </div>
       </section>
 
       <!-- Stage 2 -->
-      <section id="module-stage2" class="module-content">
-        <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-          <div class="flex items-center justify-between mb-4 pb-3 border-b">
-            <h2 class="text-lg font-bold text-gray-800">المرحلة 2: ضوابط التأشيرات والقدرة المالية</h2>
-            <span class="stage-badge stage-2">متوسط</span>
+      <section id="module-s2" class="module">
+        <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+          <div class="flex justify-between items-center mb-3 pb-2 border-b">
+            <h2 class="text-base font-bold">المرحلة 2: ضوابط التأشيرات</h2>
+            <span class="badge bg-green-100 text-green-800">متوسط</span>
           </div>
-          <div id="quiz-stage2-container" class="space-y-4"></div>
-          <div id="quiz-stage2-result" class="hidden mt-4 p-3 rounded-lg text-center"></div>
-          <div class="flex justify-between pt-4 border-t mt-4">
-            <button onclick="prevModule('module-stage1')" class="text-gray-600 text-sm"><i class="fas fa-arrow-right ml-1"></i> مراجعة 1</button>
-            <button onclick="submitStage(2)" id="submitStage2" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold py-2 px-4 rounded-lg transition">إرسال النتائج</button>
+          <div id="q-s2" class="space-y-4"></div>
+          <div id="res-s2" class="hidden mt-3 p-2 rounded text-center text-sm"></div>
+          <div class="flex justify-between pt-3 border-t mt-3">
+            <button onclick="showModule('module-s1')" class="text-gray-600 text-sm"><i class="fas fa-arrow-right ml-1"></i> مراجعة 1</button>
+            <button onclick="submitStage(2)" id="btn-s2" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded text-sm font-bold transition">إرسال النتيجة</button>
           </div>
         </div>
       </section>
 
       <!-- Stage 3 -->
-      <section id="module-stage3" class="module-content">
-        <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-          <div class="flex items-center justify-between mb-4 pb-3 border-b">
-            <h2 class="text-lg font-bold text-gray-800">المرحلة 3: الحقوق والواجبات والتسوية الودية</h2>
-            <span class="stage-badge stage-3">متقدم</span>
+      <section id="module-s3" class="module">
+        <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+          <div class="flex justify-between items-center mb-3 pb-2 border-b">
+            <h2 class="text-base font-bold">المرحلة 3: الحقوق والتسوية</h2>
+            <span class="badge bg-amber-100 text-amber-800">متقدم</span>
           </div>
-          <div id="quiz-stage3-container" class="space-y-4"></div>
-          <div id="quiz-stage3-result" class="hidden mt-4 p-3 rounded-lg text-center"></div>
-          <div class="flex justify-between pt-4 border-t mt-4">
-            <button onclick="prevModule('module-stage2')" class="text-gray-600 text-sm"><i class="fas fa-arrow-right ml-1"></i> مراجعة 2</button>
-            <button onclick="submitStage(3)" id="submitStage3" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold py-2 px-4 rounded-lg transition">إرسال النتائج</button>
+          <div id="q-s3" class="space-y-4"></div>
+          <div id="res-s3" class="hidden mt-3 p-2 rounded text-center text-sm"></div>
+          <div class="flex justify-between pt-3 border-t mt-3">
+            <button onclick="showModule('module-s2')" class="text-gray-600 text-sm"><i class="fas fa-arrow-right ml-1"></i> مراجعة 2</button>
+            <button onclick="submitStage(3)" id="btn-s3" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded text-sm font-bold transition">إرسال النتيجة</button>
           </div>
         </div>
       </section>
 
       <!-- Stage 4 -->
-      <section id="module-stage4" class="module-content">
-        <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-          <div class="flex items-center justify-between mb-4 pb-3 border-b">
-            <h2 class="text-lg font-bold text-gray-800">المرحلة 4: سيناريوهات عملية متقدمة</h2>
-            <span class="stage-badge stage-4">خبير</span>
+      <section id="module-s4" class="module">
+        <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+          <div class="flex justify-between items-center mb-3 pb-2 border-b">
+            <h2 class="text-base font-bold">المرحلة 4: سيناريوهات متقدمة</h2>
+            <span class="badge bg-red-100 text-red-800">خبير</span>
           </div>
-          <div id="quiz-stage4-container" class="space-y-4"></div>
-          <div id="quiz-stage4-result" class="hidden mt-4 p-3 rounded-lg text-center"></div>
-          <div class="flex justify-between pt-4 border-t mt-4">
-            <button onclick="prevModule('module-stage3')" class="text-gray-600 text-sm"><i class="fas fa-arrow-right ml-1"></i> مراجعة 3</button>
-            <button onclick="submitStage(4)" id="submitStage4" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold py-2 px-4 rounded-lg transition">إرسال النتائج</button>
+          <div id="q-s4" class="space-y-4"></div>
+          <div id="res-s4" class="hidden mt-3 p-2 rounded text-center text-sm"></div>
+          <div class="flex justify-between pt-3 border-t mt-3">
+            <button onclick="showModule('module-s3')" class="text-gray-600 text-sm"><i class="fas fa-arrow-right ml-1"></i> مراجعة 3</button>
+            <button onclick="submitStage(4)" id="btn-s4" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded text-sm font-bold transition">إرسال النتيجة</button>
           </div>
         </div>
       </section>
 
-      <section id="module-complete" class="module-content">
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 text-center">
-          <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <i class="fas fa-trophy text-2xl text-emerald-600"></i>
+      <section id="module-complete" class="module">
+        <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-100 text-center">
+          <div class="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3"><i class="fas fa-trophy text-2xl text-emerald-600"></i></div>
+          <h2 class="text-lg font-bold mb-2">🎉 إتمام جميع المراحل</h2>
+          <div class="grid grid-cols-2 gap-3 mb-4">
+            <button onclick="printCertificate(1)" class="p-3 bg-blue-50 hover:bg-blue-100 rounded border border-blue-200 text-sm">طباعة شهادة 1</button>
+            <button onclick="printCertificate(2)" class="p-3 bg-green-50 hover:bg-green-100 rounded border border-green-200 text-sm">طباعة شهادة 2</button>
+            <button onclick="printCertificate(3)" class="p-3 bg-amber-50 hover:bg-amber-100 rounded border border-amber-200 text-sm">طباعة شهادة 3</button>
+            <button onclick="printCertificate(4)" class="p-3 bg-red-50 hover:bg-red-100 rounded border border-red-200 text-sm">طباعة شهادة 4</button>
           </div>
-          <h2 class="text-xl font-bold text-gray-800 mb-2">🎉 مبروك! إتمام جميع المراحل</h2>
-          <p class="text-gray-600 text-sm mb-4">اختر شهادة المرحلة للطباعة</p>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-            <button onclick="printCertificate(1)" class="p-3 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 text-sm font-medium">شهادة المرحلة 1</button>
-            <button onclick="printCertificate(2)" class="p-3 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 text-sm font-medium">شهادة المرحلة 2</button>
-            <button onclick="printCertificate(3)" class="p-3 bg-amber-50 hover:bg-amber-100 rounded-lg border border-amber-200 text-sm font-medium">شهادة المرحلة 3</button>
-            <button onclick="printCertificate(4)" class="p-3 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 text-sm font-medium">شهادة المرحلة 4</button>
-          </div>
-          <button onclick="showModule('module-ops-checklist'); switchTab('operations')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold py-2 px-5 rounded-lg transition">الانتقال للعمليات</button>
+          <button onclick="showModule('module-ops'); switchTab('ops')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded text-sm font-bold">الانتقال للعمليات</button>
         </div>
       </section>
     </div>
 
     <!-- Operations View -->
-    <div id="operationsView" class="hidden">
-      <section id="module-ops-checklist" class="module-content active">
-        <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-          <div class="flex items-center justify-between mb-4 pb-3 border-b">
-            <h2 class="text-lg font-bold text-gray-800">✅ قائمة العمليات اليومية</h2>
-            <div class="text-xs text-gray-500" id="currentDate"></div>
+    <div id="ops-view" class="hidden">
+      <section id="module-ops" class="module active">
+        <div class="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+          <div class="flex justify-between items-center mb-3 pb-2 border-b">
+            <h2 class="text-base font-bold">✅ قائمة العمليات اليومية</h2>
+            <span class="text-xs text-gray-500" id="date-display"></span>
           </div>
-          <div class="flex flex-wrap gap-2 mb-4 border-b pb-2 no-print">
-            <button onclick="filterChecklist('all')" class="px-3 py-1.5 text-xs font-medium rounded-md bg-emerald-600 text-white">الكل</button>
-            <button onclick="filterChecklist('mandatory')" class="px-3 py-1.5 text-xs font-medium rounded-md bg-red-100 text-red-800 hover:bg-red-200">إلزامي</button>
-            <button onclick="filterChecklist('recommended')" class="px-3 py-1.5 text-xs font-medium rounded-md bg-amber-100 text-amber-800 hover:bg-amber-200">موصى به</button>
-            <button onclick="filterChecklist('info')" class="px-3 py-1.5 text-xs font-medium rounded-md bg-blue-100 text-blue-800 hover:bg-blue-200">معلومات</button>
+          <div class="flex gap-2 mb-3 border-b pb-2">
+            <button onclick="filterOps('all')" class="px-2 py-1 text-xs rounded bg-emerald-600 text-white">الكل</button>
+            <button onclick="filterOps('m')" class="px-2 py-1 text-xs rounded bg-red-100 text-red-800">إلزامي</button>
+            <button onclick="filterOps('r')" class="px-2 py-1 text-xs rounded bg-amber-100 text-amber-800">موصى</button>
           </div>
-          <div class="ops-checklist space-y-3 mb-4" id="opsChecklistContainer"></div>
-          <div class="bg-gray-50 p-3 rounded-lg border mb-3 no-print">
-            <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-medium text-gray-700">تقدم اليوم:</span>
-              <span class="text-xs font-bold text-emerald-700" id="opsProgressText">0/12</span>
-            </div>
-            <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
-              <div id="opsProgressBar" class="h-full bg-emerald-500 transition-all" style="width: 0%"></div>
-            </div>
+          <div id="ops-list" class="space-y-2 mb-4"></div>
+          <div class="bg-gray-50 p-2 rounded mb-3">
+            <div class="flex justify-between text-xs mb-1"><span>تقدم اليوم</span><span id="ops-pct">0%</span></div>
+            <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden"><div id="ops-bar" class="h-full bg-emerald-500 transition-all" style="width:0%"></div></div>
           </div>
         </div>
       </section>
@@ -272,335 +225,303 @@
   </main>
 </div>
 
-<!-- Print Containers (Hidden on Screen) -->
-<div class="print-only" id="print-certificate"></div>
-<div class="print-only" id="print-checklist"></div>
-
-<footer class="bg-gray-800 text-gray-400 py-3 mt-4 text-center text-xs no-print">
-  © 2026 منصة مساند الحكومية | مصدر: musaned.com.sa/ar/knowledge-center
-</footer>
+<!-- Print Overlays (Hidden on screen) - DISTINCT LAYOUTS (Req #2) -->
+<div id="print-cert" class="print-overlay"></div>
+<div id="print-check" class="print-overlay"></div>
 
 <script>
-// ============ DATA & CONFIG ============
-const stages = [
-  { id: 1, title: 'أساسيات اللوائح', difficulty: 'مبتدئ', badge: 'stage-1' },
-  { id: 2, title: 'ضوابط التأشيرات', difficulty: 'متوسط', badge: 'stage-2' },
-  { id: 3, title: 'الحقوق والتسوية', difficulty: 'متقدم', badge: 'stage-3' },
-  { id: 4, title: 'سيناريوهات متقدمة', difficulty: 'خبير', badge: 'stage-4' }
-];
-
-// 5 sample questions per stage for brevity in code, easily scalable to 20
-const quizData = {
+// ============ DATA ============
+const quizzes = {
   1: [
-    { q: 'الحد الأقصى لفترة التجربة؟', options: ['30 يوم', '60 يوم', '90 يوم', '120 يوم'], a: 2 },
-    { q: 'من يتحمل رسوم التأشيرة؟', options: ['العامل', 'صاحب العمل', 'الوكالة', 'مناصفة'], a: 1 },
-    { q: 'الراحة اليومية الدنيا؟', options: ['6 ساعات', '8 ساعات متصلة', '10 ساعات', '12 ساعة'], a: 1 },
-    { q: 'هل العقد الشفهي ملزم؟', options: ['لا', 'نعم، ولكن يحق طلب نسخة كتابية', 'نعم ولا يحق الطلب', 'فقط للأجور > 5000'], a: 1 },
-    { q: 'المهلة لرفع دعوى عمالية؟', options: ['3 أشهر', '6 أشهر', '12 شهر', 'سنتين'], a: 2 }
+    {q: 'الحد الأقصى لفترة التجربة؟', opts: ['30 يوم', '60 يوم', '90 يوم', '120 يوم'], a: 2},
+    {q: 'من يتحمل رسوم التأشيرة؟', opts: ['العامل', 'صاحب العمل', 'الوكالة', 'مناصفة'], a: 1},
+    {q: 'الراحة اليومية الدنيا؟', opts: ['6 ساعات', '8 ساعات متصلة', '10 ساعات', '12 ساعة'], a: 1},
+    {q: 'هل العقد الشفهي ملزم؟', opts: ['لا', 'نعم، ويحق طلب نسخة', 'نعم ولا يحق الطلب', 'فقط للأجور العالية'], a: 1},
+    {q: 'المهلة لرفع دعوى عمالية؟', opts: ['3 أشهر', '6 أشهر', '12 شهر', 'سنتين'], a: 2}
   ],
   2: [
-    { q: 'أقل رصيد بنكي لمقيم الفئة 1؟', options: ['50,000 ريال', '100,000 ريال', '150,000 ريال', '200,000 ريال'], a: 1 },
-    { q: 'صلاحية شهادة التأمينات؟', options: ['30 يوم', '60 يوم', '90 يوم', '180 يوم'], a: 1 },
-    { q: 'وثيقة مالية غير مقبولة؟', options: ['كشف حساب معتمد', 'شهادة تأمينات', 'صورة شاشة تطبيق بنكي', 'محفظة استثمارية موثقة'], a: 2 },
-    { q: 'التحقق من الوثائق المالية؟', options: ['يدوي', 'آلي عبر الربط الإلكتروني', 'بالبريد', 'عبر السفارة'], a: 1 },
-    { q: 'الفئات المالية للمواطنين تبدأ من؟', options: ['10 فئات', '15 فئة', '20 فئة', '25 فئة'], a: 2 }
+    {q: 'أقل رصيد بنكي لمقيم الفئة 1؟', opts: ['50K', '100K', '150K', '200K'], a: 1},
+    {q: 'صلاحية شهادة التأمينات؟', opts: ['30 يوم', '60 يوم', '90 يوم', '180 يوم'], a: 1},
+    {q: 'وثيقة مالية غير مقبولة؟', opts: ['كشف معتمد', 'شهادة تأمينات', 'صورة شاشة تطبيق', 'محفظة موثقة'], a: 2},
+    {q: 'التحقق من الوثائق؟', opts: ['يدوي', 'آلي عبر الربط', 'بالبريد', 'عبر السفارة'], a: 1},
+    {q: 'عدد الفئات للمواطنين؟', opts: ['10', '15', '20', '25'], a: 2}
   ],
   3: [
-    { q: 'الإجراء الأول عند نزاع أجور؟', options: ['دعوى قضائية', 'التسوية الودية', 'إنهاء العقد', 'إبلاغ الشرطة'], a: 1 },
-    { q: 'مدة التسوية الودية كحد أقصى؟', options: ['14 يوم', '21 يوم عمل', '30 يوم', '45 يوم'], a: 1 },
-    { q: 'حق العامل عند المرض > 15 يوم؟', options: ['إنهاء العقد', 'صرف نصف الأجر مع تقرير طبي', 'صرف كامل الأجر', 'لا شيء'], a: 1 },
-    { q: 'هل يحق منع التواصل مع السفارة؟', options: ['نعم أمنياً', 'لا مطلقاً', 'نعم في أوقات العمل', 'نعم إذا كان قاصراً'], a: 1 },
-    { q: 'التعويض عند إنهاء غير مبرر؟', options: ['لا شيء', 'أجر شهر', 'أجر شهرين', 'أجر 3 أشهر'], a: 2 }
+    {q: 'الإجراء الأول عند نزاع أجور؟', opts: ['دعوى قضائية', 'تسوية ودية', 'إنهاء عقد', 'إبلاغ شرطة'], a: 1},
+    {q: 'مدة التسوية الودية كحد أقصى؟', opts: ['14 يوم', '21 يوم عمل', '30 يوم', '45 يوم'], a: 1},
+    {q: 'حق العامل عند المرض > 15 يوم؟', opts: ['إنهاء', 'نصف الأجر مع تقرير', 'كامل الأجر', 'لا شيء'], a: 1},
+    {q: 'هل يحق منع التواصل مع السفارة؟', opts: ['نعم أمنياً', 'لا مطلقاً', 'نعم في العمل', 'نعم إذا قاصر'], a: 1},
+    {q: 'التعويض عند إنهاء غير مبرر؟', opts: ['لا شيء', 'شهر', 'شهرين', '3 أشهر'], a: 2}
   ],
   4: [
-    { q: 'عقد "سار" 100 يوم دون تحديث؟', options: ['لا شيء', 'تحديث فوراً + توثيق التأخير', 'إلغاء تلقائي', 'رفع نزاع'], a: 1 },
-    { q: 'وثيقة بنكية برصيد 95K والمطلوب 100K؟', options: ['رفض', 'قبول مع تعهد', 'قبول إذا الراتب أعلى', 'طلب وثيقة مكملة'], a: 3 },
-    { q: 'مرجع النزاع دون بند راحة في العقد؟', options: ['الاتفاق الشفهي', 'الحد الأدنى النظامي (8 ساعات)', 'عرف المهنة', 'قرار المحكمة فقط'], a: 1 },
-    { q: 'تغير الدخل بعد إصدار التأشيرة؟', options: ['إلغاء', 'لا تأثير على الصادرة', 'طلب إثبات جديد', 'غرامة'], a: 1 },
-    { q: 'العامل يعمل لطرف ثالث؟', options: ['إنذار + غرامة + منع محتمل', 'نقل كفالة', 'إنهاء فقط', 'لا إجراء'], a: 0 }
+    {q: 'عقد "سار" 100 يوم دون تحديث؟', opts: ['لا شيء', 'تحديث + توثيق تأخير', 'إلغاء', 'رفع نزاع'], a: 1},
+    {q: 'رصيد 95K والمطلوب 100K؟', opts: ['رفض', 'قبول مع تعهد', 'قبول إن الراتب أعلى', 'طلب وثيقة مكملة'], a: 3},
+    {q: 'مرجع النزاع دون بند راحة؟', opts: ['الشفهي', 'الحد النظامي (8 ساعات)', 'العرف', 'المحكمة فقط'], a: 1},
+    {q: 'تغير الدخل بعد إصدار التأشيرة؟', opts: ['إلغاء', 'لا تأثير على الصادرة', 'طلب إثبات جديد', 'غرامة'], a: 1},
+    {q: 'العامل يعمل لطرف ثالث؟', opts: ['إنذار+غرامة+منع', 'نقل كفالة', 'إنهاء فقط', 'لا إجراء'], a: 0}
   ]
 };
 
-let currentView = 'training';
-let currentModule = 'module-welcome';
-let unlockedStages = JSON.parse(localStorage.getItem('unlockedStages')) || [1];
-let stageScores = JSON.parse(localStorage.getItem('stageScores')) || {};
-let stageAnswers = {}; // Tracks per-question lock state & correctness
+const opsData = [
+  {id:1, type:'m', title:'التحقق من القدرة المالية وفق الجداول'},
+  {id:2, type:'m', title:'تجهيز وثائق مالية قابلة للتحقق'},
+  {id:3, type:'m', title:'تضمين عناصر المادة 8 في العقد'},
+  {id:4, type:'m', title:'توثيق فترة التجربة (≤90 يوم)'},
+  {id:5, type:'m', title:'ضمان راحة يومية ≥8 ساعات'},
+  {id:6, type:'m', title:'عدم احتجاز جواز سفر العامل'},
+  {id:7, type:'r', title:'توثيق يوم الراحة الأسبوعي (24+ ساعة)'},
+  {id:8, type:'r', title:'تمكين التواصل مع السفارة'},
+  {id:9, type:'r', title:'بدء التسوية الودية خلال 21 يوم'},
+  {id:10, type:'r', title:'أرشفة محاضر التسوية'},
+  {id:11, type:'i', title:'تحديث حالة العقد فوراً'},
+  {id:12, type:'i', title:'استخدام المشاركة الإلكترونية'}
+];
+
+// ============ STATE ============
+let state = {
+  unlocked: JSON.parse(localStorage.getItem('musaned_unlocked')) || [1],
+  scores: JSON.parse(localStorage.getItem('musaned_scores')) || {},
+  answers: JSON.parse(localStorage.getItem('musaned_answers')) || {},
+  ops: JSON.parse(localStorage.getItem('musaned_ops')) || {},
+  fontSize: parseInt(localStorage.getItem('musaned_fs')) || 16
+};
 
 // ============ INIT ============
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('currentDate').textContent = new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  applyTextSize();
-  renderStageProgress();
-  renderModulesNav();
-  initQuizzes();
-  loadChecklist();
-  updateOverallProgress();
+  document.getElementById('date-display').textContent = new Date().toLocaleDateString('ar-SA');
+  applyFontSize();
+  renderNav();
+  renderQuizzes();
+  renderOps();
 });
 
-// ============ TEXT SIZE ============
-function adjustText(dir) {
-  let current = parseFloat(getComputedStyle(document.documentElement).fontSize);
-  let next = dir === 0 ? 15 : current + (dir * 1.5);
-  next = Math.max(12, Math.min(22, next));
-  localStorage.setItem('textSize', next);
-  applyTextSize();
+// ============ FONT SIZE (Req #4) ============
+function changeFontSize(dir) {
+  let s = dir === 0 ? 16 : state.fontSize + (dir * 1.5);
+  s = Math.max(12, Math.min(22, s));
+  state.fontSize = s;
+  localStorage.setItem('musaned_fs', s);
+  applyFontSize();
 }
-function applyTextSize() {
-  document.documentElement.style.setProperty('--text-base', (localStorage.getItem('textSize') || 15) + 'px');
+function applyFontSize() {
+  document.documentElement.style.setProperty('--base-font', state.fontSize + 'px');
 }
 
-// ============ NAVIGATION & VIEW ============
+// ============ NAV & VIEW ============
 function toggleView() {
-  currentView = currentView === 'training' ? 'operations' : 'training';
-  document.getElementById('trainingView').classList.toggle('hidden', currentView === 'operations');
-  document.getElementById('operationsView').classList.toggle('hidden', currentView === 'training');
-  document.getElementById('trainingNav').classList.toggle('hidden', currentView === 'operations');
-  document.getElementById('viewToggleText').textContent = currentView === 'training' ? 'العمليات' : 'التدريب';
-  document.getElementById('modulesNav').parentElement.style.display = currentView === 'training' ? 'block' : 'none';
+  document.getElementById('training-view').classList.toggle('hidden');
+  document.getElementById('ops-view').classList.toggle('hidden');
+  document.getElementById('viewLabel').textContent = document.getElementById('training-view').classList.contains('hidden') ? 'التدريب' : 'العمليات';
 }
-function switchTab(view) { if(view !== currentView) toggleView(); }
+function switchTab(view) { if(view === 'ops' && !document.getElementById('ops-view').classList.contains('hidden')) return; if(view !== 'ops') document.getElementById('training-view').classList.remove('hidden'); }
 function showModule(id) {
-  document.querySelectorAll('.module-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  currentModule = id;
-  renderModulesNav();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  renderNav();
+  window.scrollTo(0,0);
 }
-function nextModule(id) { showModule(id); }
-function prevModule(id) { showModule(id); }
 
-function renderModulesNav() {
-  const nav = document.getElementById('modulesNav');
-  const ids = ['module-welcome', 'module-stage1', 'module-stage2', 'module-stage3', 'module-stage4', 'module-complete'];
-  const labels = ['🏠 المقدمة', '📘 المرحلة 1', '📗 المرحلة 2', '📙 المرحلة 3', '📕 المرحلة 4', '🎓 الإنجاز'];
-  nav.innerHTML = ids.map((id, i) => {
-    let isLocked = id.startsWith('module-stage') && !unlockedStages.includes(i);
-    let isActive = id === currentModule;
-    let isCompleted = stageScores[i] >= 15 || id === 'module-complete';
-    return `<button onclick="${isLocked ? '' : `showModule('${id}')`}" class="w-full text-right p-2 rounded-md transition flex items-center gap-2 text-sm ${isActive ? 'bg-emerald-100 text-emerald-800 font-bold' : isLocked ? 'text-gray-400 cursor-not-allowed' : isCompleted ? 'text-green-700' : 'text-gray-600 hover:bg-gray-50'}">
-      <span class="step-indicator text-xs ${isActive ? 'active' : isLocked ? 'locked' : isCompleted ? 'completed' : ''}">${isLocked ? '<i class="fas fa-lock"></i>' : i}</span>
-      <span class="truncate">${labels[i]}</span>
+function renderNav() {
+  const c = document.getElementById('nav-container');
+  const items = [
+    {id: 'module-welcome', label: '🏠 المقدمة', idx: 0},
+    {id: 'module-s1', label: '📘 المرحلة 1', idx: 1},
+    {id: 'module-s2', label: '📗 المرحلة 2', idx: 2},
+    {id: 'module-s3', label: '📙 المرحلة 3', idx: 3},
+    {id: 'module-s4', label: '📕 المرحلة 4', idx: 4},
+    {id: 'module-complete', label: '🎓 الإنجاز', idx: 5}
+  ];
+  c.innerHTML = items.map(it => {
+    const isLocked = it.idx >= 1 && it.idx <= 4 && !state.unlocked.includes(it.idx);
+    const isDone = it.idx >= 1 && it.idx <= 4 && (state.scores[it.idx] >= Math.ceil(quizzes[it.idx].length * 0.75));
+    const active = document.querySelector('.module.active')?.id === it.id;
+    return `<button onclick="${isLocked ? '' : `showModule('${it.id}')`}" class="w-full text-right p-2 rounded flex items-center gap-2 text-sm transition ${active ? 'bg-emerald-100 text-emerald-800 font-bold' : isLocked ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50'}">
+      <span class="step-ind ${active ? 'active' : isLocked ? 'locked' : isDone ? 'completed' : ''}">${isLocked ? '<i class="fas fa-lock text-[10px]"></i>' : it.idx}</span>
+      <span class="truncate">${it.label}</span>
     </button>`;
   }).join('');
 }
 
-function renderStageProgress() {
-  document.getElementById('stageProgress').innerHTML = stages.map((s, i) => {
-    let done = stageScores[i+1] >= 15;
-    let unlocked = unlockedStages.includes(i+1);
-    let score = stageScores[i+1] !== undefined ? `${stageScores[i+1]}/5` : '—';
-    return `<div class="p-2.5 rounded-lg border ${done ? 'bg-green-50 border-green-200' : unlocked ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'}">
-      <div class="flex items-center justify-between mb-1">
-        <span class="font-medium text-xs">المرحلة ${i+1}</span>
-        <span class="stage-badge ${s.badge} text-[10px] py-0.5">${s.difficulty}</span>
-      </div>
-      <div class="text-[10px] ${done ? 'text-green-700' : unlocked ? 'text-blue-700' : 'text-gray-500'}">
-        ${done ? '✅ مكتملة' : unlocked ? '🔓 متاح' : '🔒 مقفل'} | الدرجة: ${score}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ============ QUIZ LOGIC (Immediate Feedback + Lock) ============
-function initQuizzes() {
-  stages.forEach(s => {
-    const container = document.getElementById(`quiz-stage${s.id}-container`);
-    container.innerHTML = quizData[s.id].map((q, idx) => `
-      <div class="quiz-question p-3 border rounded-lg bg-gray-50" id="q-${s.id}-${idx}">
-        <p class="font-medium text-gray-800 mb-2 text-sm">${idx+1}. ${q.q}</p>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 options-group">
-          ${q.options.map((opt, oi) => `
-            <button class="quiz-option text-sm p-2 border rounded bg-white hover:bg-gray-50 text-right" 
-                    onclick="handleAnswer(${s.id}, ${idx}, ${oi})">
-              ${opt}
-            </button>
-          `).join('')}
+// ============ QUIZ LOGIC (Req #1 & #5) ============
+function renderQuizzes() {
+  for(let s=1; s<=4; s++) {
+    const cont = document.getElementById(`q-s${s}`);
+    cont.innerHTML = quizzes[s].map((q, i) => `
+      <div class="q-block p-3 border rounded bg-gray-50" id="q-s${s}-${i}">
+        <p class="font-medium text-gray-800 mb-2 text-sm">${i+1}. ${q.q}</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          ${q.opts.map((o, oi) => `<button class="q-opt p-2 border rounded bg-white text-sm text-right" onclick="pickAnswer(${s}, ${i}, ${oi})">${o}</button>`).join('')}
         </div>
-        <div class="quiz-feedback hidden" id="fb-${s.id}-${idx}"></div>
+        <div class="feedback mt-1 text-xs font-medium hidden"></div>
       </div>
     `).join('');
-  });
+  }
+  // Restore answered states (show feedback & lock)
+  for(let s=1; s<=4; s++) {
+    quizzes[s].forEach((q, i) => {
+      const key = `${s}-${i}`;
+      if(state.answers[key] !== undefined) {
+        const btns = document.getElementById(`q-s${s}-${i}`).querySelectorAll('.q-opt');
+        btns.forEach((b, oi) => {
+          b.classList.add('locked');
+          if(oi === q.a) b.classList.add('correct');
+          if(oi === state.answers[key] && oi !== q.a) b.classList.add('wrong');
+          b.onclick = null;
+        });
+        const fb = document.getElementById(`q-s${s}-${i}`).querySelector('.feedback');
+        fb.classList.remove('hidden');
+        fb.innerHTML = state.answers[key] === q.a 
+          ? '<span class="text-green-600">✅ صحيحة</span>' 
+          : `<span class="text-red-600">❌ خاطئة. الصحيحة: ${q.opts[q.a]}</span>`;
+      }
+    });
+  }
 }
 
-function handleAnswer(stageId, qIdx, selOptIdx) {
-  // Prevent changes if already answered
-  if (stageAnswers[`${stageId}-${qIdx}`] !== undefined) return;
-
-  const q = quizData[stageId][qIdx];
-  const isCorrect = selOptIdx === q.a;
-  stageAnswers[`${stageId}-${qIdx}`] = isCorrect;
-
-  // Lock all options for this question
-  const questionEl = document.getElementById(`q-${stageId}-${qIdx}`);
-  const buttons = questionEl.querySelectorAll('.quiz-option');
-  buttons.forEach((btn, i) => {
-    btn.classList.add('disabled');
-    btn.onclick = null; // Remove click handler
-    if (i === q.a) btn.classList.add('correct');
-    if (i === selOptIdx && !isCorrect) btn.classList.add('wrong');
+function pickAnswer(s, i, oi) {
+  const key = `${s}-${i}`;
+  if(state.answers[key] !== undefined) return; // LOCK (Req #5)
+  
+  state.answers[key] = oi;
+  localStorage.setItem('musaned_answers', JSON.stringify(state.answers));
+  
+  const q = quizzes[s][i];
+  const isCorrect = oi === q.a;
+  const block = document.getElementById(`q-s${s}-${i}`);
+  const btns = block.querySelectorAll('.q-opt');
+  const fb = block.querySelector('.feedback');
+  
+  // Lock all options & show feedback (Req #5)
+  btns.forEach((b, idx) => {
+    b.classList.add('locked');
+    b.onclick = null; // Prevent changes
+    if(idx === q.a) b.classList.add('correct'); // Show correct answer
+    if(idx === oi && !isCorrect) b.classList.add('wrong'); // Show wrong selection
   });
-
-  // Show feedback
-  const fb = document.getElementById(`fb-${stageId}-${qIdx}`);
+  
   fb.classList.remove('hidden');
   fb.innerHTML = isCorrect 
     ? '<span class="text-green-600">✅ إجابة صحيحة</span>' 
-    : `<span class="text-red-600">❌ إجابة خاطئة. الصحيحة: ${q.options[q.a]}</span>`;
-
-  updateStageScore(stageId);
-}
-
-function updateStageScore(stageId) {
+    : `<span class="text-red-600">❌ خاطئة. الصحيحة: ${q.opts[q.a]}</span>`;
+  
+  // Calculate score on fly
   let correct = 0;
-  quizData[stageId].forEach((_, i) => {
-    if (stageAnswers[`${stageId}-${i}`] === true) correct++;
+  quizzes[s].forEach((_, idx) => { 
+    if(state.answers[`${s}-${idx}`] === quizzes[s][idx].a) correct++; 
   });
-  stageScores[stageId] = correct;
-  localStorage.setItem('stageScores', JSON.stringify(stageScores));
-  renderStageProgress();
-  updateOverallProgress();
+  state.scores[s] = correct;
+  localStorage.setItem('musaned_scores', JSON.stringify(state.scores));
+  renderNav();
 }
 
-function submitStage(stageId) {
-  const score = stageScores[stageId] || 0;
-  const total = quizData[stageId].length;
-  const resultEl = document.getElementById(`quiz-stage${stageId}-result`);
-  const submitBtn = document.getElementById(`submitStage${stageId}`);
-  const stage = stages.find(s => s.id === stageId);
-
-  // Check if all answered
-  let answeredCount = Object.keys(stageAnswers).filter(k => k.startsWith(`${stageId}-`)).length;
-  if (answeredCount < total) {
-    alert(`⚠️ الرجاء الإجابة على جميع الأسئلة أولاً (${answeredCount}/${total})`);
-    return;
-  }
-
-  if (score >= Math.ceil(total * 0.75)) { // 75% pass
-    resultEl.className = 'mt-4 p-3 rounded-lg text-center bg-green-100 border border-green-300';
-    resultEl.innerHTML = `<div class="text-green-800 font-bold mb-1">🎉 مبروك! نجاح في ${stage.title}</div><div class="text-sm">الدرجة: ${score}/${total}</div>`;
+function submitStage(s) {
+  const total = quizzes[s].length;
+  let answered = quizzes[s].filter((_, i) => state.answers[`${s}-${i}`] !== undefined).length;
+  if(answered < total) return alert(`⚠️ أجب على جميع الأسئلة أولاً (${answered}/${total})`);
+  
+  const score = state.scores[s] || 0;
+  const pass = Math.ceil(total * 0.75);
+  const res = document.getElementById(`res-s${s}`);
+  const btn = document.getElementById(`btn-s${s}`);
+  
+  if(score >= pass) {
+    res.className = 'mt-3 p-2 rounded text-center text-sm bg-green-100 text-green-800 border border-green-300';
+    res.innerHTML = `<div class="font-bold">🎉 نجاح! الدرجة: ${score}/${total}</div>`;
     
-    // Unlock next stage
-    if (stageId < 4 && !unlockedStages.includes(stageId + 1)) {
-      unlockedStages.push(stageId + 1);
-      localStorage.setItem('unlockedStages', JSON.stringify(unlockedStages));
-      renderStageProgress();
-      renderModulesNav();
+    // UNLOCK NEXT STAGE (Req #1 FIX)
+    if(s < 4 && !state.unlocked.includes(s+1)) {
+      state.unlocked.push(s+1);
+      localStorage.setItem('musaned_unlocked', JSON.stringify(state.unlocked));
+      renderNav(); // Re-render to remove lock icon
     }
-    if (stageId === 4) setTimeout(() => showModule('module-complete'), 1500);
+    if(s === 4) setTimeout(() => showModule('module-complete'), 1000);
   } else {
-    resultEl.className = 'mt-4 p-3 rounded-lg text-center bg-red-100 border border-red-300';
-    resultEl.innerHTML = `<div class="text-red-800 font-bold mb-1">⚠️ لم تجتز المرحلة</div><div class="text-sm">الدرجة: ${score}/${total} (المطلوب ${Math.ceil(total*0.75)})</div>`;
+    res.className = 'mt-3 p-2 rounded text-center text-sm bg-red-100 text-red-800 border border-red-300';
+    res.innerHTML = `<div class="font-bold">⚠️ لم تجتز. الدرجة: ${score}/${total} (المطلوب ${pass})</div>`;
   }
-  resultEl.classList.remove('hidden');
-  submitBtn.classList.add('hidden');
+  res.classList.remove('hidden');
+  btn.classList.add('hidden');
 }
 
-// ============ CHECKLIST & PROGRESS ============
-const opsItems = [
-  { id: 1, cat: 'mandatory', phase: 'pre', title: 'التحقق من القدرة المالية وفق الجداول' },
-  { id: 2, cat: 'mandatory', phase: 'pre', title: 'تجهيز وثائق مالية قابلة للتحقق الإلكتروني' },
-  { id: 3, cat: 'mandatory', phase: 'cont', title: 'تضمين عناصر المادة 8 في العقد الموحد' },
-  { id: 4, cat: 'mandatory', phase: 'cont', title: 'توثيق فترة التجربة (≤90 يوم)' },
-  { id: 5, cat: 'mandatory', phase: 'post', title: 'ضمان راحة يومية ≥8 ساعات متصلة' },
-  { id: 6, cat: 'mandatory', phase: 'post', title: 'عدم الاحتفاظ بجواز سفر العامل' },
-  { id: 7, cat: 'recommended', phase: 'post', title: 'توثيق يوم الراحة الأسبوعي (24+ ساعة)' },
-  { id: 8, cat: 'recommended', phase: 'post', title: 'تمكين التواصل مع السفارة عند الحاجة' },
-  { id: 9, cat: 'info', phase: 'dis', title: 'بدء التسوية الودية خلال 21 يوم عمل' },
-  { id: 10, cat: 'info', phase: 'dis', title: 'أرشفة محاضر التسوية إلكترونياً' },
-  { id: 11, cat: 'recommended', phase: 'rec', title: 'تحديث حالة العقد فوراً عند أي تغيير' },
-  { id: 12, cat: 'info', phase: 'rec', title: 'استخدام المشاركة الإلكترونية للملاحظات' }
-];
-
-function renderChecklist() {
-  const saved = JSON.parse(localStorage.getItem('opsDaily') || '{}');
-  document.getElementById('opsChecklistContainer').innerHTML = opsItems.map(item => `
-    <div class="check-item ${item.cat} p-3 bg-${item.cat === 'mandatory' ? 'red' : item.cat === 'recommended' ? 'amber' : 'blue'}-50 border border-${item.cat === 'mandatory' ? 'red' : item.cat === 'recommended' ? 'amber' : 'blue'}-200 rounded-lg" data-cat="${item.cat}">
-      <div class="flex items-start gap-3">
-        <input type="checkbox" id="ops-${item.id}" class="mt-1 w-4 h-4 rounded" ${saved[item.id] ? 'checked' : ''} onchange="updateOpsProgress()">
-        <label for="ops-${item.id}" class="flex-1 cursor-pointer">
-          <strong class="text-gray-900 text-sm block">[${item.phase === 'pre' ? 'قبل التأشيرة' : item.phase === 'cont' ? 'العقد' : item.phase === 'post' ? 'بعد الوصول' : item.phase === 'dis' ? 'النزاعات' : 'الأرشفة'}] ${item.title}</strong>
-          <span class="text-xs text-gray-500 mt-0.5 block">مرجع: لوائح مساند المعتمدة</span>
-        </label>
-        <span class="badge badge-${item.cat}">${item.cat === 'mandatory' ? 'إلزامي' : item.cat === 'recommended' ? 'موصى' : 'معلومة'}</span>
-      </div>
+// ============ OPS & PROGRESS ============
+function renderOps() {
+  document.getElementById('ops-list').innerHTML = opsData.map(o => `
+    <div class="ops-row p-2 border rounded flex items-start gap-2 bg-${o.type==='m'?'red':o.type==='r'?'amber':'blue'}-50 border-${o.type==='m'?'red':o.type==='r'?'amber':'blue'}-200" data-t="${o.type}">
+      <input type="checkbox" id="ops-${o.id}" class="mt-1" ${state.ops[o.id] ? 'checked' : ''} onchange="toggleOps(${o.id}, this.checked)">
+      <label for="ops-${o.id}" class="flex-1 text-sm cursor-pointer">
+        <span class="font-medium">${o.title}</span>
+      </label>
+      <span class="badge badge-${o.type}">${o.type==='m'?'إلزامي':o.type==='r'?'موصى':'معلومة'}</span>
     </div>
   `).join('');
-  updateOpsProgress();
+  updateOpsUI();
 }
-function loadChecklist() { renderChecklist(); }
-function filterChecklist(cat) {
-  document.querySelectorAll('#opsChecklistContainer > div').forEach(d => {
-    d.style.display = (cat === 'all' || d.dataset.cat === cat) ? 'block' : 'none';
-  });
+function toggleOps(id, checked) {
+  state.ops[id] = checked;
+  localStorage.setItem('musaned_ops', JSON.stringify(state.ops));
+  updateOpsUI();
 }
-function updateOpsProgress() {
-  const checks = document.querySelectorAll('#opsChecklistContainer input');
-  const done = Array.from(checks).filter(c => c.checked).length;
-  document.getElementById('opsProgressText').textContent = `${done}/${checks.length}`;
-  document.getElementById('opsProgressBar').style.width = `${(done/checks.length)*100}%`;
-  const saved = {}; checks.forEach(c => saved[c.id] = c.checked);
-  localStorage.setItem('opsDaily', JSON.stringify(saved));
+function updateOpsUI() {
+  const done = Object.values(state.ops).filter(v=>v).length;
+  const pct = Math.round((done/opsData.length)*100);
+  document.getElementById('ops-pct').textContent = pct + '%';
+  document.getElementById('ops-bar').style.width = pct + '%';
 }
-function resetDailyChecklist() {
-  if(confirm('إعادة تعيين القائمة ليوم جديد؟')) {
-    localStorage.removeItem('opsDaily');
-    document.querySelectorAll('#opsChecklistContainer input').forEach(c => c.checked = false);
-    updateOpsProgress();
-  }
+function filterOps(t) {
+  document.querySelectorAll('.ops-row').forEach(r => r.style.display = (t==='all' || r.dataset.t===t) ? 'flex' : 'none');
 }
 
-function updateOverallProgress() {
-  const done = Object.values(stageScores).filter(s => s >= Math.ceil(quizData[Object.keys(stageScores)[0]]?.length * 0.75 || 3)).length;
-  const pct = Math.round((done / 4) * 100);
-  document.getElementById('overallProgressBar').style.width = `${pct}%`;
-  document.getElementById('overallProgress').textContent = `${pct}%`;
+// ============ PRINT (Req #2 & #3) ============
+function triggerPrint(containerId) {
+  document.body.classList.add('printing');
+  const overlay = document.getElementById(containerId === 'cert' ? 'print-cert' : 'print-check');
+  document.querySelectorAll('.print-overlay').forEach(o => o.classList.remove('active'));
+  overlay.classList.add('active');
+  setTimeout(() => window.print(), 50);
+  setTimeout(() => {
+    overlay.classList.remove('active');
+    document.body.classList.remove('printing');
+  }, 500);
 }
 
-// ============ PRINT HANDLERS (Strict A4, 1 Page) ============
-function printCertificate(stageId) {
-  const s = stages.find(x => x.id === stageId);
-  const score = stageScores[stageId] || 0;
-  const cert = document.getElementById('print-certificate');
+function printCertificate(s) {
+  const total = quizzes[s].length;
+  const score = state.scores[s] || 0;
+  // DISTINCT CERTIFICATE LAYOUT (Req #2)
+  const cert = document.getElementById('print-cert');
   cert.innerHTML = `
-    <div class="cert-title">🎖️ شهادة إتمام معتمدة</div>
-    <div class="text-sm text-gray-600 mb-2">منصة مساند الحكومية | musaned.com.sa</div>
-    <div class="cert-body">
-      <p>تشهد منصة مساند بأن:</p>
-      <p class="text-2xl font-bold text-gray-900 my-3">المتدرب المعتمد</p>
-      <p>قد أتم بنجاح <span class="font-semibold">${s.title} (المرحلة ${stageId})</span></p>
-      <p class="mt-2">بدرجة <span class="font-bold text-lg">${score}/${quizData[stageId].length}</span> وفقاً للوائح المنصة المعتمدة</p>
+    <div class="print-page">
+      <h1>🎖️ شهادة إتمام معتمدة</h1>
+      <p class="text-sm text-gray-500 mb-4">منصة مساند الحكومية | musaned.com.sa</p>
+      <div class="body">
+        <p>تشهد المنصة بأن المتدرب المعتمد قد أتم بنجاح:</p>
+        <p class="text-xl font-bold text-gray-900 my-3">المرحلة ${s}: ${['أساسيات اللوائح','ضوابط التأشيرات','الحقوق والتسوية','سيناريوهات متقدمة'][s-1]}</p>
+        <p>بدرجة <span class="font-bold text-lg">${score}/${total}</span> وفقاً للوائح المعتمدة</p>
+      </div>
+      <div class="sigs">
+        <div class="text-center"><div class="sig-line"></div>توقيع المدرب</div>
+        <div class="text-center"><div class="sig-line"></div>ختم المنصة</div>
+      </div>
+      <div class="text-[8pt] text-gray-500 mt-4">رقم التحقق: MUSANED-S${s}-${Math.random().toString(36).substr(2,8).toUpperCase()} | ${new Date().toLocaleDateString('ar-SA')}</div>
     </div>
-    <div class="signatures">
-      <div class="text-center w-1/3"><div class="border-b-2 border-gray-400 w-32 mx-auto mb-2"></div>توقيع المدرب</div>
-      <div class="text-center w-1/3"><div class="border-b-2 border-gray-400 w-32 mx-auto mb-2"></div>ختم المنصة</div>
-    </div>
-    <div class="text-[9pt] text-gray-500 mt-4">رقم التحقق: MUSANED-STG${stageId}-${Math.random().toString(36).substr(2,8).toUpperCase()} | ${new Date().toLocaleDateString('ar-SA')}</div>
   `;
-  triggerPrint('print-certificate');
+  triggerPrint('cert');
 }
 
 function printChecklist() {
-  const saved = JSON.parse(localStorage.getItem('opsDaily') || '{}');
-  const items = document.getElementById('print-checklist');
-  let html = `<h2>✅ قائمة العمليات اليومية - مساند <span class="text-xs font-normal text-gray-600 block mt-1">${new Date().toLocaleDateString('ar-SA')}</span></h2>`;
-  opsItems.forEach(it => {
-    const checked = saved[`ops-${it.id}`] ? 'checked' : '';
-    html += `<div class="print-row"><div class="check-box ${checked}">${checked ? '✓' : ''}</div><span class="flex-1 font-medium">${it.title}</span><span class="text-[8pt] text-gray-500 w-16 text-left">${it.cat === 'mandatory' ? '⚠️' : it.cat === 'recommended' ? '💡' : 'ℹ️'}</span></div>`;
-  });
-  items.innerHTML = html;
-  triggerPrint('print-checklist');
-}
-
-function triggerPrint(printId) {
-  document.body.classList.add('print-active');
-  document.querySelectorAll('.print-only').forEach(el => el.style.display = 'none');
-  document.getElementById(printId).style.display = 'block';
-  setTimeout(() => window.print(), 100);
-  setTimeout(() => {
-    document.body.classList.remove('print-active');
-    document.querySelectorAll('.print-only').forEach(el => el.style.display = 'none');
-  }, 500);
+  // DISTINCT CHECKLIST LAYOUT - CONCISE, 1 PAGE (Req #2 & #3)
+  const check = document.getElementById('print-check');
+  check.innerHTML = `
+    <div class="print-page">
+      <h2>✅ قائمة العمليات اليومية - مساند <span class="text-[10pt] font-normal block mt-1">${new Date().toLocaleDateString('ar-SA')}</span></h2>
+      ${opsData.map(o => `<div class="row"><div class="box ${state.ops[o.id] ? 'done' : ''}">${state.ops[o.id] ? '✓' : ''}</div><span class="flex-1 font-medium">${o.title}</span></div>`).join('')}
+      <div class="mt-4 pt-2 border-t flex justify-between text-[9pt] text-gray-500">
+        <span>تم الطباعة آلياً من نظام التدريب</span>
+        <span>نسبة الإنجاز: ${Object.values(state.ops).filter(v=>v).length}/${opsData.length}</span>
+      </div>
+    </div>
+  `;
+  triggerPrint('check');
 }
 </script>
 </body>

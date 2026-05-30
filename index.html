@@ -3,50 +3,61 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🎯 مساند | تدريب + عمليات يومية</title>
+  <title>🎯 مساند | تدريب + عمليات + شهادات</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
     body { font-family: 'Tajawal', sans-serif; background: #f8fafc; }
-    .module-card { transition: all 0.3s ease; }
-    .module-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
-    .checklist-item.checked label { text-decoration: line-through; color: #94a3b8; }
-    .progress-bar { transition: width 0.5s ease; }
-    .quiz-option:hover { background: #f1f5f9; cursor: pointer; }
-    .quiz-option.selected { background: #dbeafe; border-color: #3b82f6; }
     .module-content { display: none; }
     .module-content.active { display: block; animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .data-table { font-size: 0.875rem; }
-    .data-table th { background: #f1f5f9; font-weight: 600; }
-    .data-table tr:hover { background: #f8fafc; }
-    .badge { padding: 2px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; }
-    .badge-success { background: #dcfce7; color: #166534; }
-    .badge-warning { background: #fef3c7; color: #92400e; }
-    .badge-danger { background: #fee2e2; color: #991b1b; }
+    .step-indicator { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.875rem; }
+    .step-indicator.active { background: #059669; color: white; }
+    .step-indicator.completed { background: #10b981; color: white; }
+    .step-indicator.locked { background: #e5e7eb; color: #9ca3af; }
+    .quiz-option { transition: all 0.2s; }
+    .quiz-option:hover { background: #f1f5f9; }
+    .quiz-option.selected { background: #dbeafe; border-color: #3b82f6; }
+    .badge { padding: 2px 10px; border-radius: 9999px; font-size: 0.7rem; font-weight: 500; }
+    .badge-mandatory { background: #fee2e2; color: #991b1b; }
+    .badge-recommended { background: #fef3c7; color: #92400e; }
     .badge-info { background: #dbeafe; color: #1e40af; }
-    .step-indicator { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; }
-    .step-indicator.active { background: #3b82f6; color: white; }
-    .step-indicator.completed { background: #22c55e; color: white; }
-    .tab-btn.active { background: #3b82f6; color: white; }
-    .ops-checklist .check-item { border-right: 4px solid transparent; }
-    .ops-checklist .check-item.mandatory { border-right-color: #ef4444; }
-    .ops-checklist .check-item.recommended { border-right-color: #f59e0b; }
-    .ops-checklist .check-item.info { border-right-color: #3b82f6; }
-    .print-only { display: none; }
+    .check-item { border-right: 4px solid transparent; transition: all 0.2s; }
+    .check-item:hover { background: #f8fafc; }
+    .check-item.mandatory { border-right-color: #ef4444; }
+    .check-item.recommended { border-right-color: #f59e0b; }
+    .check-item.info { border-right-color: #3b82f6; }
+    .stage-badge { padding: 4px 12px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+    .stage-1 { background: #dbeafe; color: #1e40af; }
+    .stage-2 { background: #dcfce7; color: #166534; }
+    .stage-3 { background: #fef3c7; color: #92400e; }
+    .stage-4 { background: #fee2e2; color: #991b1b; }
+    
+    /* Print Styles */
     @media print {
       .no-print { display: none !important; }
       .print-only { display: block !important; }
-      body { background: white; }
-      .module-content { display: block !important; opacity: 1 !important; }
+      body { background: white; font-size: 11pt; }
+      .module-content { display: none !important; }
+      .module-content.certificate-print { display: block !important; position: absolute; top: 0; left: 0; width: 100%; padding: 40px; }
+      .checklist-print { display: block !important; }
+      .checklist-print .check-item { page-break-inside: avoid; margin-bottom: 8px; padding: 4px 0; border: none !important; }
+      .checklist-print .check-desc { display: none !important; }
+      .checklist-print .badge { display: none !important; }
+      .certificate-border { border: 8px double #059669; padding: 60px 40px; text-align: center; }
+      .certificate-title { font-size: 28pt; font-weight: bold; color: #059669; margin-bottom: 20px; }
+      .certificate-body { font-size: 14pt; line-height: 2; margin: 30px 0; }
+      .certificate-signature { margin-top: 60px; display: flex; justify-content: space-around; }
+      .signature-line { border-top: 2px solid #333; width: 200px; padding-top: 8px; font-size: 11pt; }
     }
+    .print-only { display: none; }
   </style>
 </head>
 <body class="min-h-screen">
 
 <!-- Header -->
-<header class="bg-gradient-to-l from-emerald-700 to-emerald-600 text-white shadow-lg sticky top-0 z-50">
+<header class="bg-gradient-to-l from-emerald-700 to-emerald-600 text-white shadow-lg sticky top-0 z-50 no-print">
   <div class="max-w-7xl mx-auto px-4 py-4">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
@@ -55,14 +66,14 @@
         </div>
         <div>
           <h1 class="text-lg font-bold">🎯 نظام مساند للعمليات</h1>
-          <p class="text-xs text-emerald-100">تدريب الملتحقين الجدد + قائمة عمليات يومية</p>
+          <p class="text-xs text-emerald-100">تدريب + عمليات يومية + شهادات مرحلية</p>
         </div>
       </div>
       <div class="text-left flex items-center gap-4">
         <div class="hidden md:block">
-          <div class="text-sm font-medium mb-1">تقدمك: <span id="progressPercent">0%</span></div>
-          <div class="w-40 h-2 bg-emerald-900/30 rounded-full overflow-hidden">
-            <div id="progressBar" class="progress-bar h-full bg-green-400 rounded-full" style="width: 0%"></div>
+          <div class="text-sm font-medium mb-1">تقدمك الكلي: <span id="overallProgress">0%</span></div>
+          <div class="w-48 h-2 bg-emerald-900/30 rounded-full overflow-hidden">
+            <div id="overallProgressBar" class="h-full bg-green-400 rounded-full transition-all" style="width: 0%"></div>
           </div>
         </div>
         <button onclick="toggleView()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
@@ -73,10 +84,10 @@
   </div>
 </header>
 
-<!-- View Tabs (Mobile) -->
+<!-- Mobile Tabs -->
 <div class="lg:hidden bg-white border-b sticky top-16 z-40 no-print">
   <div class="flex">
-    <button onclick="switchTab('training')" id="tab-training" class="tab-btn active flex-1 py-3 text-sm font-medium text-gray-700 border-b-2 border-blue-600">
+    <button onclick="switchTab('training')" id="tab-training" class="tab-btn active flex-1 py-3 text-sm font-medium text-gray-700 border-b-2 border-emerald-600">
       <i class="fas fa-graduation-cap ml-1"></i> التدريب
     </button>
     <button onclick="switchTab('operations')" id="tab-operations" class="tab-btn flex-1 py-3 text-sm font-medium text-gray-500 border-b-2 border-transparent">
@@ -94,41 +105,48 @@
     <!-- Quick Actions -->
     <div class="bg-white rounded-xl shadow-md p-5 border border-gray-100">
       <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
-        <i class="fas fa-bolt text-amber-500"></i>
-        إجراءات سريعة
+        <i class="fas fa-bolt text-amber-500"></i> إجراءات سريعة
       </h3>
       <div class="grid grid-cols-2 gap-2">
         <button onclick="showModule('module-ops-checklist'); switchTab('operations')" class="p-3 bg-emerald-50 hover:bg-emerald-100 rounded-lg text-center transition">
           <i class="fas fa-clipboard-list text-emerald-600 mb-1"></i>
           <div class="text-xs font-medium">قائمة العمليات</div>
         </button>
-        <button onclick="exportChecklistPDF()" class="p-3 bg-blue-50 hover:bg-blue-100 rounded-lg text-center transition">
+        <button onclick="printChecklist()" class="p-3 bg-blue-50 hover:bg-blue-100 rounded-lg text-center transition">
           <i class="fas fa-file-pdf text-blue-600 mb-1"></i>
-          <div class="text-xs font-medium">تصدير PDF</div>
+          <div class="text-xs font-medium">طباعة القائمة</div>
         </button>
         <button onclick="resetDailyChecklist()" class="p-3 bg-amber-50 hover:bg-amber-100 rounded-lg text-center transition col-span-2">
           <i class="fas fa-redo text-amber-600 mb-1"></i>
-          <div class="text-xs font-medium">إعادة تعيين قائمة اليوم</div>
+          <div class="text-xs font-medium">إعادة تعيين اليوم</div>
         </button>
       </div>
     </div>
 
-    <!-- Training Navigation (shown in training view) -->
+    <!-- Stage Progress -->
+    <div class="bg-white rounded-xl shadow-md p-5 border border-gray-100">
+      <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <i class="fas fa-layer-group text-emerald-600"></i> مراحل الاختبار
+      </h3>
+      <div class="space-y-3" id="stageProgress">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+
+    <!-- Training Navigation -->
     <div id="trainingNav" class="bg-white rounded-xl shadow-md p-5 border border-gray-100">
       <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
-        <i class="fas fa-list-ol text-blue-600"></i>
-        وحدات التدريب
+        <i class="fas fa-list-ol text-blue-600"></i> وحدات التدريب
       </h3>
       <nav class="space-y-2" id="modulesNav">
         <!-- Injected by JS -->
       </nav>
     </div>
 
-    <!-- Operations Quick Reference (shown in operations view) -->
+    <!-- Operations Quick Reference -->
     <div id="opsNav" class="bg-white rounded-xl shadow-md p-5 border border-gray-100 hidden">
       <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
-        <i class="fas fa-book-law text-emerald-600"></i>
-        مرجع مساند السريع
+        <i class="fas fa-book-law text-emerald-600"></i> مرجع مساند السريع
       </h3>
       <div class="space-y-3 text-sm">
         <div class="p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -143,56 +161,22 @@
           <strong class="text-blue-900 block mb-1">📋 وثائق مطلوبة</strong>
           <ul class="text-blue-800 text-xs space-y-1">
             <li>• عقد موحد (المادة 8)</li>
-            <li• تأمين صحي ساري</li>
-            <li>• إثبات قدرة مالية (للتأشيرة)</li>
+            <li>• تأمين صحي ساري</li>
+            <li>• إثبات قدرة مالية</li>
           </ul>
         </div>
-        <div class="p-3 bg-green-50 border border-green-200 rounded-lg">
-          <strong class="text-green-900 block mb-1">✅ حقوق العامل</strong>
-          <ul class="text-green-800 text-xs space-y-1">
-            <li>• راحة يومية 8 ساعات+</li>
-            <li>• يوم راحة أسبوعي</li>
-            <li>• إجازة سنوية 30 يوم بعد سنتين</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Compliance Status -->
-    <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-5 border border-emerald-200">
-      <h4 class="font-bold text-emerald-900 mb-3 flex items-center gap-2">
-        <i class="fas fa-chart-pie"></i> حالة الامتثال اليوم
-      </h4>
-      <div class="space-y-2">
-        <div class="flex justify-between text-sm">
-          <span class="text-gray-600">العقود المراجعة</span>
-          <span class="font-bold text-emerald-700" id="contractsReviewed">0/0</span>
-        </div>
-        <div class="flex justify-between text-sm">
-          <span class="text-gray-600">حالات مُحدَّثة</span>
-          <span class="font-bold text-blue-700" id="statusesUpdated">0/0</span>
-        </div>
-        <div class="flex justify-between text-sm">
-          <span class="text-gray-600">مخالفات مُعالَجة</span>
-          <span class="font-bold text-amber-700" id="violationsResolved">0/0</span>
-        </div>
-      </div>
-      <div class="mt-4 pt-3 border-t border-emerald-200">
-        <button onclick="generateDailyReport()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition">
-          <i class="fas fa-file-alt ml-1"></i> إنشاء تقرير يومي
-        </button>
       </div>
     </div>
 
   </aside>
 
-  <!-- Main Content Area -->
+  <!-- Main Content -->
   <main class="flex-1 min-w-0">
 
     <!-- ============ TRAINING VIEW ============ -->
     <div id="trainingView">
 
-      <!-- Welcome Module -->
+      <!-- Welcome -->
       <section id="module-welcome" class="module-content active">
         <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
           <div class="text-center mb-8">
@@ -200,621 +184,191 @@
               <i class="fas fa-graduation-cap text-3xl text-emerald-600"></i>
             </div>
             <h2 class="text-2xl font-bold text-gray-800 mb-2">أهلاً بك في برنامج تدريب مساند! 🎉</h2>
-            <p class="text-gray-600">برنامج معتمد على لوائح <strong>منصة مساند الحكومية</strong> لتأهيلك للعمل في إدارة عقود الاستقدام.</p>
+            <p class="text-gray-600">برنامج معتمد على لوائح <strong>منصة مساند الحكومية</strong> يتكون من 4 مراحل تدريبية متدرجة الصعوبة.</p>
           </div>
 
           <div class="grid md:grid-cols-2 gap-4 mb-6">
             <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
-              <h4 class="font-bold text-blue-900 mb-2">📚 ماذا ستتعلم؟</h4>
+              <h4 class="font-bold text-blue-900 mb-2">📚 هيكل البرنامج</h4>
               <ul class="text-sm text-blue-800 space-y-1">
-                <li>✓ لوائح العمل المنزلي (المواد 8، 15، 16)</li>
-                <li>✓ ضوابط إصدار التأشيرات والقدرة المالية</li>
-                <li>✓ حقوق وواجبات صاحب العمل والعامل</li>
-                <li>✓ آلية التسوية الودية للنزاعات</li>
-                <li>✓ العقوبات والمخالفات النظامية</li>
+                <li>• <strong>المرحلة 1:</strong> أساسيات لوائح العمل المنزلي (20 سؤال)</li>
+                <li>• <strong>المرحلة 2:</strong> ضوابط التأشيرات والقدرة المالية (20 سؤال)</li>
+                <li>• <strong>المرحلة 3:</strong> الحقوق والواجبات والتسوية الودية (20 سؤال)</li>
+                <li>• <strong>المرحلة 4:</strong> سيناريوهات عملية متقدمة (20 سؤال)</li>
               </ul>
             </div>
             <div class="bg-green-50 p-4 rounded-lg border border-green-200">
-              <h4 class="font-bold text-green-900 mb-2">🎯 متطلبات الشهادة</h4>
+              <h4 class="font-bold text-green-900 mb-2">🎯 متطلبات النجاح</h4>
               <ul class="text-sm text-green-800 space-y-1">
-                <li>✓ إتمام 5 وحدات تدريبية</li>
-                <li>✓ تحقيق 80% في الاختبار النهائي</li>
-                <li>✓ تطبيق عملي على سيناريوهات مساند</li>
-                <li>✓ إتمام قائمة التحقق الشخصية</li>
+                <li>• درجة النجاح في كل مرحلة: 75% (15/20)</li>
+                <li>• إتمام قائمة التحقق التشغيلية اليومية</li>
+                <li>• الحصول على الشهادات الأربع المعتمدة</li>
               </ul>
             </div>
           </div>
 
-          <div class="bg-amber-50 p-4 rounded-lg border border-amber-200 mb-6">
-            <h4 class="font-bold text-amber-900 mb-2">💡 مصدر المحتوى</h4>
-            <p class="text-sm text-amber-800">
-              جميع المواد مستمدة حصراً من <strong>مركز المعرفة بمنصة مساند</strong> (musaned.com.sa) - منصة حكومية مسجلة لدى هيئة الحكومة الرقمية.
-            </p>
-          </div>
-
-          <button onclick="nextModule('module-1')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-lg transition flex items-center justify-center gap-2">
-            ابدأ الوحدة الأولى <i class="fas fa-arrow-left"></i>
+          <button onclick="nextModule('module-stage1')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-lg transition flex items-center justify-center gap-2">
+            ابدأ المرحلة الأولى <i class="fas fa-arrow-left"></i>
           </button>
         </div>
       </section>
 
-      <!-- Module 1: Labor Regulations -->
-      <section id="module-1" class="module-content">
+      <!-- Stage 1 Quiz: Basic Regulations -->
+      <section id="module-stage1" class="module-content">
         <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-          <div class="flex items-center gap-3 mb-6 pb-4 border-b">
-            <div class="step-indicator active">1</div>
-            <h2 class="text-xl font-bold text-gray-800">الوحدة 1: لوائح العمل المنزلي (مساند)</h2>
-          </div>
-
-          <div class="prose prose-sm max-w-none text-gray-700 mb-6">
-            <p>تنظم منصة مساند علاقة العمل المنزلي وفق نظام العمل السعودي. إليك الأساسيات:</p>
-          </div>
-
-          <!-- Article 8: Contract Requirements -->
-          <div class="mb-6">
-            <h4 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
-              <i class="fas fa-file-contract text-blue-600"></i>
-              المادة 8: عناصر العقد الإلزامية
-            </h4>
-            <div class="grid md:grid-cols-2 gap-3">
-              <div class="p-3 bg-gray-50 rounded-lg border">
-                <strong class="text-gray-800 text-sm">بيانات الأطراف</strong>
-                <ul class="text-xs text-gray-600 mt-1 space-y-1">
-                  <li>• اسم صاحب العمل وعنوانه</li>
-                  <li>• جنسية العامل ومهنته</li>
-                  <li>• العنوان الوطني ووسائل التواصل</li>
-                </ul>
-              </div>
-              <div class="p-3 bg-gray-50 rounded-lg border">
-                <strong class="text-gray-800 text-sm">شروط العمل</strong>
-                <ul class="text-xs text-gray-600 mt-1 space-y-1">
-                  <li>• نوع العمل المطلوب</li>
-                  <li>• الأجر وطريقة السداد</li>
-                  <li>• ساعات العمل وفترات الراحة</li>
-                </ul>
-              </div>
-              <div class="p-3 bg-gray-50 rounded-lg border">
-                <strong class="text-gray-800 text-sm">المدة والإنهاء</strong>
-                <ul class="text-xs text-gray-600 mt-1 space-y-1">
-                  <li>• مدة العقد وطريقة التجديد</li>
-                  <li>• أحكام فترة التجربة (≤90 يوم)</li>
-                  <li>• طرق إنهاء العقد والتعويضات</li>
-                </ul>
-              </div>
-              <div class="p-3 bg-gray-50 rounded-lg border">
-                <strong class="text-gray-800 text-sm">الالتزامات النظامية</strong>
-                <ul class="text-xs text-gray-600 mt-1 space-y-1">
-                  <li>• وثائق التأمين الصحي</li>
-                  <li>• الحقوق والواجبات المتبادلة</li>
-                  <li>• أحكام التسوية الودية</li>
-                </ul>
-              </div>
+          <div class="flex items-center justify-between mb-6 pb-4 border-b">
+            <div class="flex items-center gap-3">
+              <div class="step-indicator active stage-1">1</div>
+              <h2 class="text-xl font-bold text-gray-800">المرحلة 1: أساسيات لوائح العمل المنزلي</h2>
             </div>
+            <span class="stage-badge stage-1">المستوى: مبتدئ</span>
           </div>
 
-          <!-- Working Conditions Table -->
-          <div class="mb-6">
-            <h4 class="font-bold text-gray-800 mb-3">⏱️ شروط العمل والراحة (نظام مساند)</h4>
-            <div class="overflow-x-auto">
-              <table class="data-table w-full border-collapse">
-                <thead>
-                  <tr>
-                    <th class="text-right p-3 border-b">البند</th>
-                    <th class="text-right p-3 border-b">الحد الأدنى النظامي</th>
-                    <th class="text-right p-3 border-b">ملاحظة مساند</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="p-3 border-b font-medium">ساعات العمل اليومية</td>
-                    <td class="p-3 border-b">≤ 10 ساعات</td>
-                    <td class="p-3 border-b">لا تشمل فترات الراحة</td>
-                  </tr>
-                  <tr>
-                    <td class="p-3 border-b font-medium">العمل المتصل</td>
-                    <td class="p-3 border-b">≤ 5 ساعات</td>
-                    <td class="p-3 border-b">يجب راحة 30 دقيقة بعدها</td>
-                  </tr>
-                  <tr>
-                    <td class="p-3 border-b font-medium">الراحة اليومية</td>
-                    <td class="p-3 border-b">≥ 8 ساعات متصلة</td>
-                    <td class="p-3 border-b">حق مكفول للعامل</td>
-                  </tr>
-                  <tr>
-                    <td class="p-3 border-b font-medium">الراحة الأسبوعية</td>
-                    <td class="p-3 border-b">يوم كامل (24+ ساعة)</td>
-                    <td class="p-3 border-b">بأجر كامل</td>
-                  </tr>
-                  <tr>
-                    <td class="p-3 border-b font-medium">الإجازة السنوية</td>
-                    <td class="p-3 border-b">30 يوم بعد سنتين</td>
-                    <td class="p-3 border-b">تُحسب من تاريخ الوصول</td>
-                  </tr>
-                  <tr>
-                    <td class="p-3 border-b font-medium">الإجازة المرضية</td>
-                    <td class="p-3 border-b">30 يوم (15 كامل + 15 نصف)</td>
-                    <td class="p-3 border-b">بتقرير طبي معتمد</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          <div id="quiz-stage1-container" class="space-y-6">
+            <!-- Questions injected by JS -->
           </div>
 
-          <!-- Exercise -->
-          <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <h4 class="font-bold text-blue-900 mb-3">🔍 تمرين: تحقق من العقد</h4>
-            <p class="text-sm text-blue-800 mb-3">عقد عمل منزلي لا يذكر "فترة الراحة اليومية". ما الإجراء الصحيح وفق مساند؟</p>
-            <div class="space-y-2">
-              <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                <input type="radio" name="ex1" value="a" class="quiz-radio">
-                <span>تجاهل الأمر، فالعقد شفهي</span>
-              </label>
-              <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                <input type="radio" name="ex1" value="b" class="quiz-radio">
-                <span>طلب تعديل العقد لإضافة بند الراحة (8 ساعات) ✓</span>
-              </label>
-              <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                <input type="radio" name="ex1" value="c" class="quiz-radio">
-                <span>إلغاء العقد فوراً</span>
-              </label>
-            </div>
-            <button onclick="checkEx1()" class="mt-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded transition">
-              تحقق
-            </button>
-            <p id="ex1-feedback" class="mt-2 text-sm font-medium hidden"></p>
-          </div>
+          <div id="quiz-stage1-result" class="hidden mt-6 p-4 rounded-lg text-center"></div>
 
           <div class="flex justify-between pt-4 border-t">
             <button onclick="prevModule('module-welcome')" class="text-gray-600 hover:text-gray-800 font-medium flex items-center gap-2">
               <i class="fas fa-arrow-right"></i> السابق
             </button>
-            <button onclick="nextModule('module-2'); markChecklist('checklist-1')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition flex items-center gap-2">
-              التالي <i class="fas fa-arrow-left"></i>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- Module 2: Visa Controls -->
-      <section id="module-2" class="module-content">
-        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-          <div class="flex items-center gap-3 mb-6 pb-4 border-b">
-            <div class="step-indicator completed">1</div>
-            <div class="step-indicator active">2</div>
-            <h2 class="text-xl font-bold text-gray-800">الوحدة 2: ضوابط إصدار التأشيرات</h2>
-          </div>
-
-          <!-- Financial Capacity Tables (Musaned Source) -->
-          <div class="mb-6">
-            <h4 class="font-bold text-gray-800 mb-4">💰 متطلبات القدرة المالية (مساند)</h4>
-            
-            <div class="mb-4">
-              <h5 class="font-medium text-gray-700 mb-2">للمواطنين ومن في حكمهم:</h5>
-              <div class="overflow-x-auto">
-                <table class="data-table w-full border-collapse">
-                  <thead>
-                    <tr>
-                      <th class="text-right p-3 border-b">الفئة</th>
-                      <th class="text-right p-3 border-b">الحد الأدنى للدخل (ريال)</th>
-                      <th class="text-right p-3 border-b">الرصيد البنكي (ريال)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr><td class="p-3 border-b">الفئة 1</td><td class="p-3 border-b">محدد بالراتب</td><td class="p-3 border-b">40,000</td></tr>
-                    <tr><td class="p-3 border-b">الفئة 2</td><td class="p-3 border-b">7,000</td><td class="p-3 border-b">60,000</td></tr>
-                    <tr><td class="p-3 border-b">الفئة 3</td><td class="p-3 border-b">25,000</td><td class="p-3 border-b">200,000</td></tr>
-                    <tr><td class="p-3 border-b">...</td><td class="p-3 border-b">...</td><td class="p-3 border-b">...</td></tr>
-                    <tr><td class="p-3 border-b">الفئة 20+</td><td class="p-3 border-b">360,000</td><td class="p-3 border-b">5,100,000</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div>
-              <h5 class="font-medium text-gray-700 mb-2">للمقيمين ومن في حكمهم:</h5>
-              <div class="overflow-x-auto">
-                <table class="data-table w-full border-collapse">
-                  <thead>
-                    <tr>
-                      <th class="text-right p-3 border-b">الفئة</th>
-                      <th class="text-right p-3 border-b">الحد الأدنى للدخل (ريال)</th>
-                      <th class="text-right p-3 border-b">الرصيد البنكي (ريال)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr><td class="p-3 border-b">الفئة 1</td><td class="p-3 border-b">10,000</td><td class="p-3 border-b">100,000</td></tr>
-                    <tr><td class="p-3 border-b">الفئة 2</td><td class="p-3 border-b">20,000</td><td class="p-3 border-b">200,000</td></tr>
-                    <tr><td class="p-3 border-b">الفئة 3</td><td class="p-3 border-b">39,000</td><td class="p-3 border-b">570,000</td></tr>
-                    <tr><td class="p-3 border-b">...</td><td class="p-3 border-b">...</td><td class="p-3 border-b">...</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- Required Documents -->
-          <div class="mb-6">
-            <h4 class="font-bold text-gray-800 mb-3">📄 وثائق إثبات القدرة المالية المقبولة:</h4>
-            <div class="grid md:grid-cols-2 gap-3">
-              <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-                <strong class="text-emerald-900 text-sm">للموظفين:</strong>
-                <ul class="text-emerald-800 text-xs mt-1 space-y-1">
-                  <li>• شهادة من التأمينات (أقل من 60 يوم)</li>
-                  <li>• خطاب جهة العمل (للموظفين الحكوميين)</li>
-                </ul>
-              </div>
-              <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <strong class="text-blue-900 text-sm">للبنوك:</strong>
-                <ul class="text-blue-800 text-xs mt-1 space-y-1">
-                  <li>• شهادة رصيد بنكي</li>
-                  <li>• كشف حساب معتمد</li>
-                  <li>• محفظة استثمارية موثقة</li>
-                </ul>
-              </div>
-            </div>
-            <p class="text-xs text-gray-500 mt-2">* جميع الوثائق يجب أن تكون قابلة للتحقق إلكترونياً</p>
-          </div>
-
-          <!-- Scenario -->
-          <div class="bg-amber-50 p-4 rounded-lg border border-amber-200">
-            <h4 class="font-bold text-amber-900 mb-3">🎭 سيناريو عملي</h4>
-            <p class="text-sm text-amber-800 mb-2">
-              <strong>الحالة:</strong> مقيم براتب 15,000 ريال يريد استقدام عاملة منزلية.
-            </p>
-            <p class="text-sm text-amber-800 mb-2">
-              <strong>السؤال:</strong> هل يستوفي شروط الفئة 1 للمقيمين؟
-            </p>
-            <div class="flex gap-2">
-              <button onclick="checkScenario('yes')" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded">نعم ✓</button>
-              <button onclick="checkScenario('no')" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded">لا ✗</button>
-            </div>
-            <p id="scenario-feedback" class="mt-2 text-sm font-medium hidden"></p>
-          </div>
-
-          <div class="flex justify-between pt-4 border-t">
-            <button onclick="prevModule('module-1')" class="text-gray-600 hover:text-gray-800 font-medium flex items-center gap-2">
-              <i class="fas fa-arrow-right"></i> السابق
-            </button>
-            <button onclick="nextModule('module-3'); markChecklist('checklist-2')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition flex items-center gap-2">
-              التالي <i class="fas fa-arrow-left"></i>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- Module 3: Rights & Obligations -->
-      <section id="module-3" class="module-content">
-        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-          <div class="flex items-center gap-3 mb-6 pb-4 border-b">
-            <div class="step-indicator completed">1</div>
-            <div class="step-indicator completed">2</div>
-            <div class="step-indicator active">3</div>
-            <h2 class="text-xl font-bold text-gray-800">الوحدة 3: الحقوق والواجبات (المادتان 15 و16)</h2>
-          </div>
-
-          <!-- Employer Obligations (Article 15) -->
-          <div class="mb-6">
-            <h4 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <i class="fas fa-user-tie text-blue-600"></i>
-              واجبات صاحب العمل (المادة 15)
-            </h4>
-            <div class="space-y-3">
-              <div class="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <i class="fas fa-ban text-red-600 mt-1"></i>
-                <div>
-                  <strong class="text-red-900 text-sm">ممنوع الاحتفاظ بجواز السفر</strong>
-                  <p class="text-xs text-red-800">يُعد مخالفة نظامية تستوجب غرامة حتى 20,000 ريال</p>
-                </div>
-              </div>
-              <div class="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <i class="fas fa-hand-holding-usd text-blue-600 mt-1"></i>
-                <div>
-                  <strong class="text-blue-900 text-sm">تحمل جميع الرسوم</strong>
-                  <p class="text-xs text-blue-800">التأشيرة، الإقامة، التصاريح، والتجديدات على عاتق صاحب العمل</p>
-                </div>
-              </div>
-              <div class="flex items-start gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <i class="fas fa-home text-green-600 mt-1"></i>
-                <div>
-                  <strong class="text-green-900 text-sm">توفير السكن والمأكل</strong>
-                  <p class="text-xs text-green-800">أو بدل مناسب وفق ما هو متفق عليه في العقد</p>
-                </div>
-              </div>
-              <div class="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                <i class="fas fa-comments text-amber-600 mt-1"></i>
-                <div>
-                  <strong class="text-amber-900 text-sm">تمكين التواصل</strong>
-                  <p class="text-xs text-amber-800">مع العائلة، السفارة، والجهات الرسمية عند الحاجة</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Worker Duties (Article 16) -->
-          <div class="mb-6">
-            <h4 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <i class="fas fa-user-check text-emerald-600"></i>
-              واجبات العامل المنزلي (المادة 16)
-            </h4>
-            <ul class="space-y-2 text-sm text-gray-700">
-              <li class="flex items-start gap-2">
-                <i class="fas fa-check-circle text-green-600 mt-1"></i>
-                <span>أداء العمل بأمانة واتباع التعليمات المشروعة</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <i class="fas fa-check-circle text-green-600 mt-1"></i>
-                <span>الحفاظ على ممتلكات صاحب العمل وسرية المعلومات</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <i class="fas fa-check-circle text-green-600 mt-1"></i>
-                <span>احترام القيم الإسلامية وأنظمة المملكة وتقاليدها</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <i class="fas fa-times-circle text-red-600 mt-1"></i>
-                <span class="text-red-700">ممنوع العمل لدى الغير أو في مهنة غير المتفق عليها</span>
-              </li>
-            </ul>
-          </div>
-
-          <!-- Penalties Reference -->
-          <div class="bg-red-50 p-4 rounded-lg border border-red-200">
-            <h4 class="font-bold text-red-900 mb-3">⚖️ العقوبات النظامية (مساند)</h4>
-            <div class="grid md:grid-cols-2 gap-3 text-sm">
-              <div>
-                <strong class="text-red-800">على صاحب العمل:</strong>
-                <ul class="text-red-700 text-xs mt-1 space-y-1">
-                  <li>• غرامة حتى 20,000 ريال</li>
-                  <li>• منع استقدام حتى 3 سنوات</li>
-                  <li>• منع دائم في حال التكرار</li>
-                </ul>
-              </div>
-              <div>
-                <strong class="text-red-800">على العامل:</strong>
-                <ul class="text-red-700 text-xs mt-1 space-y-1">
-                  <li>• غرامة حتى 2,000 ريال</li>
-                  <li>• منع من العمل في المملكة</li>
-                  <li>• يتحمل تكلفة العودة لبلده</li>
-                </ul>
-              </div>
-            </div>
-            <p class="text-xs text-red-600 mt-2">* تُضاعف الغرامة بعدد الأشخاص المتأثرين بالمخالفة</p>
-          </div>
-
-          <div class="flex justify-between pt-4 border-t">
-            <button onclick="prevModule('module-2')" class="text-gray-600 hover:text-gray-800 font-medium flex items-center gap-2">
-              <i class="fas fa-arrow-right"></i> السابق
-            </button>
-            <button onclick="nextModule('module-4'); markChecklist('checklist-3')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition flex items-center gap-2">
-              التالي <i class="fas fa-arrow-left"></i>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- Module 4: Dispute Resolution -->
-      <section id="module-4" class="module-content">
-        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-          <div class="flex items-center gap-3 mb-6 pb-4 border-b">
-            <div class="step-indicator completed">1</div>
-            <div class="step-indicator completed">2</div>
-            <div class="step-indicator completed">3</div>
-            <div class="step-indicator active">4</div>
-            <h2 class="text-xl font-bold text-gray-800">الوحدة 4: التسوية الودية للنزاعات</h2>
-          </div>
-
-          <!-- Process Flow -->
-          <div class="mb-6">
-            <h4 class="font-bold text-gray-800 mb-4">🔄 آلية التسوية الودية (قبل القضاء)</h4>
-            <div class="relative">
-              <div class="absolute top-6 right-8 left-8 h-1 bg-gray-200"></div>
-              <div class="relative flex justify-between">
-                <div class="text-center w-24">
-                  <div class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-bold">1</div>
-                  <span class="text-xs font-medium">رفع النزاع</span>
-                </div>
-                <div class="text-center w-24">
-                  <div class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-bold">2</div>
-                  <span class="text-xs font-medium">جلسة ودية (≤21 يوم)</span>
-                </div>
-                <div class="text-center w-24">
-                  <div class="w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-bold">3</div>
-                  <span class="text-xs font-medium">اتفاق أو إحالة</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Outcomes -->
-          <div class="grid md:grid-cols-2 gap-4 mb-6">
-            <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
-              <h5 class="font-bold text-green-900 mb-2">✅ في حال الاتفاق</h5>
-              <ul class="text-sm text-green-800 space-y-1">
-                <li>• توثيق محضر التسوية</li>
-                <li>• توقيع الطرفين</li>
-                <li>• إغلاق الملف نهائياً</li>
-                <li>• لا يجوز رفع الدعوى لاحقاً</li>
-              </ul>
-            </div>
-            <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-              <h5 class="font-bold text-amber-900 mb-2">⚠️ في حال عدم الاتفاق</h5>
-              <ul class="text-sm text-amber-800 space-y-1">
-                <li>• إصدار محضر بعدم التسوية</li>
-                <li>• إحالة النزاع لمحكمة العمل</li>
-                <li>• استئناف الإجراءات القضائية</li>
-                <li>• المهلة: 12 شهر من إنهاء العقد</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- Required Documents -->
-          <div class="mb-6">
-            <h4 class="font-bold text-gray-800 mb-3">📋 مستندات جلسة التسوية المطلوبة:</h4>
-            <div class="flex flex-wrap gap-2">
-              <span class="badge badge-info">عقد العمل الموحد</span>
-              <span class="badge badge-info">إثبات علاقة العمل</span>
-              <span class="badge badge-info">وثائق المطالبة (أجور، تعويض...)</span>
-              <span class="badge badge-info">توكيل رسمي (إن وُجد)</span>
-              <span class="badge badge-warning">جميع الوثائق يجب أن تكون مصدقة إلكترونياً</span>
-            </div>
-          </div>
-
-          <div class="flex justify-between pt-4 border-t">
-            <button onclick="prevModule('module-3')" class="text-gray-600 hover:text-gray-800 font-medium flex items-center gap-2">
-              <i class="fas fa-arrow-right"></i> السابق
-            </button>
-            <button onclick="nextModule('module-5'); markChecklist('checklist-4')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition flex items-center gap-2">
-              التالي <i class="fas fa-arrow-left"></i>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- Module 5: Final Assessment -->
-      <section id="module-5" class="module-content">
-        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-          <div class="flex items-center gap-3 mb-6 pb-4 border-b">
-            <div class="step-indicator completed">1</div>
-            <div class="step-indicator completed">2</div>
-            <div class="step-indicator completed">3</div>
-            <div class="step-indicator completed">4</div>
-            <div class="step-indicator active">5</div>
-            <h2 class="text-xl font-bold text-gray-800">الوحدة 5: الاختبار النهائي (مساند)</h2>
-          </div>
-
-          <div id="quiz-container" class="space-y-6">
-            <!-- Q1 -->
-            <div class="quiz-question p-4 border rounded-lg bg-gray-50">
-              <p class="font-medium text-gray-800 mb-3">1. ما الحد الأقصى لفترة التجربة في عقد العمل المنزلي وفق مساند؟</p>
-              <div class="space-y-2">
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q1" value="a" class="quiz-radio"> <span>30 يوم</span>
-                </label>
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q1" value="b" class="quiz-radio"> <span>60 يوم</span>
-                </label>
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q1" value="c" class="quiz-radio"> <span>90 يوم ✓</span>
-                </label>
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q1" value="d" class="quiz-radio"> <span>180 يوم</span>
-                </label>
-              </div>
-            </div>
-            <!-- Q2 -->
-            <div class="quiz-question p-4 border rounded-lg bg-gray-50">
-              <p class="font-medium text-gray-800 mb-3">2. أي مما يلي يُعد مخالفة نظامية على صاحب العمل؟</p>
-              <div class="space-y-2">
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q2" value="a" class="quiz-radio"> <span>توفير سكن مناسب</span>
-                </label>
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q2" value="b" class="quiz-radio"> <span>الاحتفاظ بجواز سفر العامل ✓</span>
-                </label>
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q2" value="c" class="quiz-radio"> <span>دفع الأجر في موعده</span>
-                </label>
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q2" value="d" class="quiz-radio"> <span>منح يوم راحة أسبوعي</span>
-                </label>
-              </div>
-            </div>
-            <!-- Q3 -->
-            <div class="quiz-question p-4 border rounded-lg bg-gray-50">
-              <p class="font-medium text-gray-800 mb-3">3. كم مدة جلسة التسوية الودية كحد أقصى؟</p>
-              <div class="space-y-2">
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q3" value="a" class="quiz-radio"> <span>7 أيام عمل</span>
-                </label>
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q3" value="b" class="quiz-radio"> <span>14 يوم عمل</span>
-                </label>
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q3" value="c" class="quiz-radio"> <span>21 يوم عمل ✓</span>
-                </label>
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q3" value="d" class="quiz-radio"> <span>30 يوم عمل</span>
-                </label>
-              </div>
-            </div>
-            <!-- Q4 -->
-            <div class="quiz-question p-4 border rounded-lg bg-gray-50">
-              <p class="font-medium text-gray-800 mb-3">4. ما الحد الأدنى للراحة اليومية للعامل المنزلي؟</p>
-              <div class="space-y-2">
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q4" value="a" class="quiz-radio"> <span>4 ساعات</span>
-                </label>
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q4" value="b" class="quiz-radio"> <span>6 ساعات</span>
-                </label>
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q4" value="c" class="quiz-radio"> <span>8 ساعات متصلة ✓</span>
-                </label>
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q4" value="d" class="quiz-radio"> <span>10 ساعات</span>
-                </label>
-              </div>
-            </div>
-            <!-- Q5 -->
-            <div class="quiz-question p-4 border rounded-lg bg-gray-50">
-              <p class="font-medium text-gray-800 mb-3">5. متى يستحق العامل إجازة سنوية 30 يوم؟</p>
-              <div class="space-y-2">
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q5" value="a" class="quiz-radio"> <span>بعد سنة واحدة</span>
-                </label>
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q5" value="b" class="quiz-radio"> <span>بعد سنتين متتاليتين ✓</span>
-                </label>
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q5" value="c" class="quiz-radio"> <span>بعد 3 سنوات</span>
-                </label>
-                <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer">
-                  <input type="radio" name="q5" value="d" class="quiz-radio"> <span>فور الوصول</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <div id="quiz-result" class="hidden mt-6 p-4 rounded-lg text-center"></div>
-
-          <div class="flex justify-between pt-4 border-t">
-            <button onclick="prevModule('module-4')" class="text-gray-600 hover:text-gray-800 font-medium flex items-center gap-2">
-              <i class="fas fa-arrow-right"></i> مراجعة
-            </button>
-            <button onclick="submitQuiz()" id="submitQuizBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition flex items-center gap-2">
+            <button onclick="submitStage(1)" id="submitStage1" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition">
               إرسال الإجابات <i class="fas fa-paper-plane"></i>
             </button>
-            <button onclick="restartQuiz()" id="restartQuizBtn" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition flex items-center gap-2">
-              إعادة الاختبار <i class="fas fa-redo"></i>
+            <button onclick="restartStage(1)" id="restartStage1" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition">
+              إعادة المحاولة <i class="fas fa-redo"></i>
             </button>
           </div>
         </div>
       </section>
 
-      <!-- Completion Certificate -->
+      <!-- Stage 2 Quiz: Visa Controls -->
+      <section id="module-stage2" class="module-content">
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+          <div class="flex items-center justify-between mb-6 pb-4 border-b">
+            <div class="flex items-center gap-3">
+              <div class="step-indicator completed stage-1">1</div>
+              <div class="step-indicator active stage-2">2</div>
+              <h2 class="text-xl font-bold text-gray-800">المرحلة 2: ضوابط التأشيرات والقدرة المالية</h2>
+            </div>
+            <span class="stage-badge stage-2">المستوى: متوسط</span>
+          </div>
+
+          <div id="quiz-stage2-container" class="space-y-6"></div>
+          <div id="quiz-stage2-result" class="hidden mt-6 p-4 rounded-lg text-center"></div>
+
+          <div class="flex justify-between pt-4 border-t">
+            <button onclick="prevModule('module-stage1')" class="text-gray-600 hover:text-gray-800 font-medium flex items-center gap-2">
+              <i class="fas fa-arrow-right"></i> مراجعة المرحلة 1
+            </button>
+            <button onclick="submitStage(2)" id="submitStage2" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition">
+              إرسال الإجابات <i class="fas fa-paper-plane"></i>
+            </button>
+            <button onclick="restartStage(2)" id="restartStage2" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition">
+              إعادة المحاولة <i class="fas fa-redo"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stage 3 Quiz: Rights & Disputes -->
+      <section id="module-stage3" class="module-content">
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+          <div class="flex items-center justify-between mb-6 pb-4 border-b">
+            <div class="flex items-center gap-3">
+              <div class="step-indicator completed stage-1">1</div>
+              <div class="step-indicator completed stage-2">2</div>
+              <div class="step-indicator active stage-3">3</div>
+              <h2 class="text-xl font-bold text-gray-800">المرحلة 3: الحقوق والواجبات والتسوية الودية</h2>
+            </div>
+            <span class="stage-badge stage-3">المستوى: متقدم</span>
+          </div>
+
+          <div id="quiz-stage3-container" class="space-y-6"></div>
+          <div id="quiz-stage3-result" class="hidden mt-6 p-4 rounded-lg text-center"></div>
+
+          <div class="flex justify-between pt-4 border-t">
+            <button onclick="prevModule('module-stage2')" class="text-gray-600 hover:text-gray-800 font-medium flex items-center gap-2">
+              <i class="fas fa-arrow-right"></i> مراجعة المرحلة 2
+            </button>
+            <button onclick="submitStage(3)" id="submitStage3" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition">
+              إرسال الإجابات <i class="fas fa-paper-plane"></i>
+            </button>
+            <button onclick="restartStage(3)" id="restartStage3" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition">
+              إعادة المحاولة <i class="fas fa-redo"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stage 4 Quiz: Advanced Scenarios -->
+      <section id="module-stage4" class="module-content">
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+          <div class="flex items-center justify-between mb-6 pb-4 border-b">
+            <div class="flex items-center gap-3">
+              <div class="step-indicator completed stage-1">1</div>
+              <div class="step-indicator completed stage-2">2</div>
+              <div class="step-indicator completed stage-3">3</div>
+              <div class="step-indicator active stage-4">4</div>
+              <h2 class="text-xl font-bold text-gray-800">المرحلة 4: سيناريوهات عملية متقدمة</h2>
+            </div>
+            <span class="stage-badge stage-4">المستوى: خبير</span>
+          </div>
+
+          <div id="quiz-stage4-container" class="space-y-6"></div>
+          <div id="quiz-stage4-result" class="hidden mt-6 p-4 rounded-lg text-center"></div>
+
+          <div class="flex justify-between pt-4 border-t">
+            <button onclick="prevModule('module-stage3')" class="text-gray-600 hover:text-gray-800 font-medium flex items-center gap-2">
+              <i class="fas fa-arrow-right"></i> مراجعة المرحلة 3
+            </button>
+            <button onclick="submitStage(4)" id="submitStage4" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition">
+              إرسال الإجابات <i class="fas fa-paper-plane"></i>
+            </button>
+            <button onclick="restartStage(4)" id="restartStage4" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition">
+              إعادة المحاولة <i class="fas fa-redo"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Completion Overview -->
       <section id="module-complete" class="module-content">
         <div class="bg-white rounded-xl shadow-md p-8 border border-gray-100 text-center">
           <div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <i class="fas fa-certificate text-4xl text-emerald-600"></i>
           </div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">🎉 مبروك! أكملت تدريب مساند</h2>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">🎉 مبروك! أكملت جميع مراحل تدريب مساند</h2>
           <p class="text-gray-600 mb-6">أصبحت مؤهلاً للعمل وفق لوائح منصة مساند الحكومية</p>
           
-          <div class="bg-gradient-to-r from-emerald-50 to-teal-50 p-6 rounded-lg border border-emerald-200 mb-6 max-w-md mx-auto">
-            <p class="text-sm text-gray-700 mb-1">شهادة إتمام معتمدة</p>
-            <p class="font-bold text-lg text-gray-900" id="certificateName">اسم المتدرب</p>
-            <p class="text-sm text-gray-600">تاريخ الإتمام: <span id="certificateDate"></span></p>
-            <p class="text-xs text-gray-500 mt-2">رقم الشهادة: MUSANED-<span id="certNumber"></span></p>
-            <p class="text-xs text-emerald-700 mt-1">مصدر المحتوى: musaned.com.sa/ar/knowledge-center</p>
+          <div class="grid md:grid-cols-2 gap-4 mb-6">
+            <button onclick="printCertificate(1)" class="p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition">
+              <i class="fas fa-certificate text-blue-600 mb-2"></i>
+              <div class="font-medium">طباعة شهادة المرحلة 1</div>
+              <div class="text-xs text-gray-500">أساسيات اللوائح</div>
+            </button>
+            <button onclick="printCertificate(2)" class="p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition">
+              <i class="fas fa-certificate text-green-600 mb-2"></i>
+              <div class="font-medium">طباعة شهادة المرحلة 2</div>
+              <div class="text-xs text-gray-500">ضوابط التأشيرات</div>
+            </button>
+            <button onclick="printCertificate(3)" class="p-4 bg-amber-50 hover:bg-amber-100 rounded-lg border border-amber-200 transition">
+              <i class="fas fa-certificate text-amber-600 mb-2"></i>
+              <div class="font-medium">طباعة شهادة المرحلة 3</div>
+              <div class="text-xs text-gray-500">الحقوق والتسوية</div>
+            </button>
+            <button onclick="printCertificate(4)" class="p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition">
+              <i class="fas fa-certificate text-red-600 mb-2"></i>
+              <div class="font-medium">طباعة شهادة المرحلة 4</div>
+              <div class="text-xs text-gray-500">السيناريوهات المتقدمة</div>
+            </button>
           </div>
 
-          <div class="flex flex-col sm:flex-row gap-3 justify-center">
-            <button onclick="window.print()" class="bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 px-6 rounded-lg transition flex items-center justify-center gap-2">
-              <i class="fas fa-print"></i> طباعة الشهادة
-            </button>
-            <button onclick="showModule('module-ops-checklist'); switchTab('operations')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-6 rounded-lg transition flex items-center justify-center gap-2">
-              <i class="fas fa-clipboard-check"></i> الانتقال للعمليات
-            </button>
-          </div>
+          <button onclick="showModule('module-ops-checklist'); switchTab('operations')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-8 rounded-lg transition flex items-center justify-center gap-2 mx-auto">
+            <i class="fas fa-clipboard-check"></i> الانتقال لقائمة العمليات
+          </button>
         </div>
       </section>
 
@@ -834,26 +388,31 @@
             <div class="text-sm text-gray-500" id="currentDate"></div>
           </div>
 
-          <!-- Checklist Tabs -->
-          <div class="flex flex-wrap gap-2 mb-6 border-b pb-2">
+          <!-- Filter Tabs -->
+          <div class="flex flex-wrap gap-2 mb-6 border-b pb-2 no-print">
             <button onclick="filterChecklist('all')" class="px-4 py-2 text-sm font-medium rounded-lg bg-emerald-600 text-white">الكل</button>
             <button onclick="filterChecklist('mandatory')" class="px-4 py-2 text-sm font-medium rounded-lg bg-red-100 text-red-800 hover:bg-red-200">إلزامي ⚠️</button>
             <button onclick="filterChecklist('recommended')" class="px-4 py-2 text-sm font-medium rounded-lg bg-amber-100 text-amber-800 hover:bg-amber-200">موصى به 💡</button>
             <button onclick="filterChecklist('info')" class="px-4 py-2 text-sm font-medium rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-200">معلومات ℹ️</button>
           </div>
 
-          <!-- Checklist Items (Musaned-Sourced) -->
-          <div class="ops-checklist space-y-3 mb-6" id="opsChecklistContainer">
+          <!-- Checklist Items with Detailed Descriptions -->
+          <div class="ops-checklist space-y-4 mb-6" id="opsChecklistContainer">
             <!-- Pre-Visa Phase -->
             <div class="check-item mandatory p-4 bg-red-50 border border-red-200 rounded-lg" data-category="mandatory" data-phase="pre-visa">
               <div class="flex items-start gap-3">
                 <input type="checkbox" id="ops-1" class="mt-1 w-4 h-4 text-red-600 rounded" onchange="updateOpsProgress()">
                 <label for="ops-1" class="flex-1 cursor-pointer">
                   <strong class="text-red-900 block">[قبل التأشيرة] التحقق من القدرة المالية</strong>
-                  <p class="text-xs text-red-800 mt-1">التأكد من استيفاء الراتب/الرصيد وفق جداول مساند (المواطنون/المقيمون/ذوو الإعاقة)</p>
-                  <span class="text-xs text-gray-500">مرجع: ضوابط إصدار التأشيرة - مساند</span>
+                  <p class="check-desc text-xs text-red-800 mt-1">
+                    التأكد من استيفاء صاحب العمل للحد الأدنى للدخل الشهري و/أو الرصيد البنكي وفق جداول مساند المعتمدة:
+                    <br>• المواطنون: تبدأ من راتب 7,000 ريال + رصيد 60,000 ريال (الفئة 2)
+                    <br>• المقيمون: تبدأ من راتب 10,000 ريال + رصيد 100,000 ريال (الفئة 1)
+                    <br>• ذوو الإعاقة: متطلبات مخفّضة (الفئة 2: راتب 5,000 ريال + رصيد 25,000 ريال)
+                    <br><span class="text-gray-500">مرجع: ضوابط إصدار التأشيرات - مساند، الجداول 1.1، 1.2، 1.3</span>
+                  </p>
+                  <span class="badge badge-mandatory mt-2">إلزامي نظامياً</span>
                 </label>
-                <span class="badge badge-danger">إلزامي</span>
               </div>
             </div>
 
@@ -861,11 +420,16 @@
               <div class="flex items-start gap-3">
                 <input type="checkbox" id="ops-2" class="mt-1 w-4 h-4 text-red-600 rounded" onchange="updateOpsProgress()">
                 <label for="ops-2" class="flex-1 cursor-pointer">
-                  <strong class="text-red-900 block">[قبل التأشيرة] تجهيز وثائق إثبات مالية قابلة للتحقق</strong>
-                  <p class="text-xs text-red-800 mt-1">شهادة تأمينات (≤60 يوم) / كشف بنكي معتمد / خطاب جهة عمل</p>
-                  <span class="text-xs text-gray-500">مرجع: متطلبات الوثائق - مساند</span>
+                  <strong class="text-red-900 block">[قبل التأشيرة] تجهيز وثائق إثبات مالية قابلة للتحقق إلكترونياً</strong>
+                  <p class="check-desc text-xs text-red-800 mt-1">
+                    الوثائق المقبولة وفق مساند يجب أن تكون قابلة للتحقق الآلي:
+                    <br>• للموظفين: شهادة من المؤسسة العامة للتأمينات الاجتماعية (لا تتجاوز 60 يوماً)
+                    <br>• للموظفين الحكوميين: خطاب إلكتروني معتمد من جهة العمل
+                    <br>• للوثائق البنكية: شهادة رصيد / كشف حساب / محفظة استثمارية معتمدة من البنك مع رمز تحقق إلكتروني
+                    <br><span class="text-gray-500">مرجع: متطلبات الوثائق - مركز معرفة مساند</span>
+                  </p>
+                  <span class="badge badge-mandatory mt-2">إلزامي نظامياً</span>
                 </label>
-                <span class="badge badge-danger">إلزامي</span>
               </div>
             </div>
 
@@ -874,11 +438,21 @@
               <div class="flex items-start gap-3">
                 <input type="checkbox" id="ops-3" class="mt-1 w-4 h-4 text-red-600 rounded" onchange="updateOpsProgress()">
                 <label for="ops-3" class="flex-1 cursor-pointer">
-                  <strong class="text-red-900 block">[العقد] تضمين جميع عناصر المادة 8</strong>
-                  <p class="text-xs text-red-800 mt-1">نوع العمل، بيانات الأطراف، الأجر، ساعات العمل، المدة، التأمين، الحقوق والواجبات</p>
-                  <span class="text-xs text-gray-500">مرجع: المادة 8 - نظام العمل المنزلي</span>
+                  <strong class="text-red-900 block">[العقد] تضمين جميع العناصر الإلزامية للمادة 8</strong>
+                  <p class="check-desc text-xs text-red-800 mt-1">
+                    يجب أن يحتوي عقد العمل المنزلي الموحد على:
+                    <br>• نوع العمل المطلوب وأوصافه الدقيقة
+                    <br>• بيانات صاحب العمل الكاملة (الاسم، الجنسية، العنوان الوطني، وسائل التواصل)
+                    <br>• بيانات العامل (الاسم، الجنسية، المهنة)
+                    <br>• الأجر وطريقة وتاريخ السداد
+                    <br>• ساعات العمل اليومية (≤10 ساعات) وفترات الراحة (≥8 ساعات متصلة يومياً)
+                    <br>• مدة العقد وطرق التجديد والإنهاء
+                    <br>• أحكام فترة التجربة (لا تتجاوز 90 يوماً)
+                    <br>• وثائق التأمين الصحي السارية
+                    <br><span class="text-gray-500">مرجع: المادة 8 من نظام العمل المنزلي - مساند</span>
+                  </p>
+                  <span class="badge badge-mandatory mt-2">إلزامي نظامياً</span>
                 </label>
-                <span class="badge badge-danger">إلزامي</span>
               </div>
             </div>
 
@@ -886,11 +460,17 @@
               <div class="flex items-start gap-3">
                 <input type="checkbox" id="ops-4" class="mt-1 w-4 h-4 text-red-600 rounded" onchange="updateOpsProgress()">
                 <label for="ops-4" class="flex-1 cursor-pointer">
-                  <strong class="text-red-900 block">[العقد] توثيق فترة التجربة (≤90 يوم)</strong>
-                  <p class="text-xs text-red-800 mt-1">ذكر مدة التجربة وشروط الإنهاء المبكر من قبل أي طرف</p>
-                  <span class="text-xs text-gray-500">مرجع: أحكام فترة التجربة - مساند</span>
+                  <strong class="text-red-900 block">[العقد] توثيق فترة التجربة وشروط الإنهاء المبكر</strong>
+                  <p class="check-desc text-xs text-red-800 mt-1">
+                    وفقاً للمادة 8:
+                    <br>• مدة فترة التجربة لا تتجاوز 90 يوماً من تاريخ بدء العقد
+                    <br>• يحق لأي من الطرفين إنهاء العقد خلال فترة التجربة دون تعويض
+                    <br>• يجب ذكر هذه الأحكام صراحة في نص العقد
+                    <br>• بعد انتهاء فترة التجربة، يسري نظام التعويضات عند الإنهاء غير المبرر
+                    <br><span class="text-gray-500">مرجع: أحكام فترة التجربة - نظام العمل المنزلي</span>
+                  </p>
+                  <span class="badge badge-mandatory mt-2">إلزامي نظامياً</span>
                 </label>
-                <span class="badge badge-danger">إلزامي</span>
               </div>
             </div>
 
@@ -899,11 +479,17 @@
               <div class="flex items-start gap-3">
                 <input type="checkbox" id="ops-5" class="mt-1 w-4 h-4 text-red-600 rounded" onchange="updateOpsProgress()">
                 <label for="ops-5" class="flex-1 cursor-pointer">
-                  <strong class="text-red-900 block">[بعد الوصول] ضمان الراحة اليومية ≥8 ساعات</strong>
-                  <p class="text-xs text-red-800 mt-1">تسجيل أوقات العمل والراحة لتجنب المخالفات</p>
-                  <span class="text-xs text-gray-500">مرجع: شروط العمل - المادة 15</span>
+                  <strong class="text-red-900 block">[بعد الوصول] ضمان الراحة اليومية ≥8 ساعات متصلة</strong>
+                  <p class="check-desc text-xs text-red-800 mt-1">
+                    وفقاً للمادة 15 من نظام العمل المنزلي:
+                    <br>• يحق للعامل راحة يومية لا تقل عن 8 ساعات متصلة
+                    <br>• لا يجوز تكليف العامل بأية أعمال خلال فترة الراحة
+                    <br>• يُستثنى من ذلك حالات الطوارئ القصوى مع تعويض العامل لاحقاً
+                    <br>• يُنصح بتسجيل أوقات العمل والراحة في سجل داخلي لتجنب أي نزاعات
+                    <br><span class="text-gray-500">مرجع: المادة 15 - حقوق العامل، مساند</span>
+                  </p>
+                  <span class="badge badge-mandatory mt-2">إلزامي نظامياً</span>
                 </label>
-                <span class="badge badge-danger">إلزامي</span>
               </div>
             </div>
 
@@ -911,11 +497,17 @@
               <div class="flex items-start gap-3">
                 <input type="checkbox" id="ops-6" class="mt-1 w-4 h-4 text-red-600 rounded" onchange="updateOpsProgress()">
                 <label for="ops-6" class="flex-1 cursor-pointer">
-                  <strong class="text-red-900 block">[بعد الوصول] عدم الاحتفاظ بجواز سفر العامل</strong>
-                  <p class="text-xs text-red-800 mt-1">تذكير صاحب العمل بأن هذه مخالفة تستوجب غرامة حتى 20,000 ريال</p>
-                  <span class="text-xs text-gray-500">مرجع: المادة 15 - مساند</span>
+                  <strong class="text-red-900 block">[بعد الوصول] عدم الاحتفاظ بجواز سفر العامل أو وثائقه الشخصية</strong>
+                  <p class="check-desc text-xs text-red-800 mt-1">
+                    تحذير نظامي هام وفق المادة 15:
+                    <br>• يُعد الاحتفاظ بجواز سفر العامل أو هويته أو أي وثيقة شخصية مخالفة نظامية جسيمة
+                    <br>• العقوبة: غرامة تصل إلى 20,000 ريال ومنع من الاستقدام لمدة تصل إلى 3 سنوات
+                    <br>• في حال التكرار: منع دائم من الاستقدام
+                    <br>• يُنصح بتسليم الوثائق للعامل فور وصوله مع توثيق ذلك كتابياً
+                    <br><span class="text-gray-500">مرجع: المادة 15، جدول العقوبات - مساند</span>
+                  </p>
+                  <span class="badge badge-mandatory mt-2">إلزامي نظامياً</span>
                 </label>
-                <span class="badge badge-danger">إلزامي</span>
               </div>
             </div>
 
@@ -923,11 +515,17 @@
               <div class="flex items-start gap-3">
                 <input type="checkbox" id="ops-7" class="mt-1 w-4 h-4 text-amber-600 rounded" onchange="updateOpsProgress()">
                 <label for="ops-7" class="flex-1 cursor-pointer">
-                  <strong class="text-amber-900 block">[بعد الوصول] توثيق يوم الراحة الأسبوعي</strong>
-                  <p class="text-xs text-amber-800 mt-1">تسجيل اليوم المحدد للراحة (24+ ساعة) بأجر كامل</p>
-                  <span class="text-xs text-gray-500">مرجع: حقوق العامل - مساند</span>
+                  <strong class="text-amber-900 block">[بعد الوصول] توثيق يوم الراحة الأسبوعي (24+ ساعة) بأجر كامل</strong>
+                  <p class="check-desc text-xs text-amber-800 mt-1">
+                    وفقاً لحقوق العامل في نظام مساند:
+                    <br>• يحق للعامل يوم راحة أسبوعي لا يقل عن 24 ساعة متصلة
+                    <br>• يُدفع الأجر الكامل لهذا اليوم حتى لو لم يعمل
+                    <br>• يُفضل تحديد اليوم مسبقاً بالاتفاق مع العامل وتوثيقه
+                    <br>• في حال ضرورة العمل في يوم الراحة: يُمنح يوم بديل أو يُدفع بدل عمل إضافي
+                    <br><span class="text-gray-500">مرجع: حقوق العامل - مركز معرفة مساند</span>
+                  </p>
+                  <span class="badge badge-recommended mt-2">موصى به</span>
                 </label>
-                <span class="badge badge-warning">موصى به</span>
               </div>
             </div>
 
@@ -935,11 +533,17 @@
               <div class="flex items-start gap-3">
                 <input type="checkbox" id="ops-8" class="mt-1 w-4 h-4 text-amber-600 rounded" onchange="updateOpsProgress()">
                 <label for="ops-8" class="flex-1 cursor-pointer">
-                  <strong class="text-amber-900 block">[بعد الوصول] تمكين التواصل مع السفارة عند الحاجة</strong>
-                  <p class="text-xs text-amber-800 mt-1">تسهيل إجراءات التواصل الرسمي للعامل مع بعثته الدبلوماسية</p>
-                  <span class="text-xs text-gray-500">مرجع: المادة 15 - مساند</span>
+                  <strong class="text-amber-900 block">[بعد الوصول] تمكين التواصل مع السفارة أو القنصلية عند الحاجة</strong>
+                  <p class="check-desc text-xs text-amber-800 mt-1">
+                    وفقاً للمادة 15 من نظام العمل المنزلي:
+                    <br>• يجب على صاحب العمل تمكين العامل من التواصل مع بعثته الدبلوماسية عند الحاجة
+                    <br>• يشمل ذلك: تجديد الوثائق، الاستشارات القانونية، أو حالات الطوارئ
+                    <br>• لا يجوز منع العامل من الاتصال بالجهات الرسمية أو عائلته في بلده
+                    <br>• يُنصح بتوفير وسيلة اتصال مناسبة (هاتف، إنترنت) وتوثيق أي طلبات رسمية
+                    <br><span class="text-gray-500">مرجع: المادة 15 - واجبات صاحب العمل، مساند</span>
+                  </p>
+                  <span class="badge badge-recommended mt-2">موصى به</span>
                 </label>
-                <span class="badge badge-warning">موصى به</span>
               </div>
             </div>
 
@@ -948,11 +552,17 @@
               <div class="flex items-start gap-3">
                 <input type="checkbox" id="ops-9" class="mt-1 w-4 h-4 text-blue-600 rounded" onchange="updateOpsProgress()">
                 <label for="ops-9" class="flex-1 cursor-pointer">
-                  <strong class="text-blue-900 block">[وقاية النزاعات] توثيق أي شكوى خلال 21 يوم</strong>
-                  <p class="text-xs text-blue-800 mt-1">بدء إجراءات التسوية الودية فوراً لتجنب الإحالة للقضاء</p>
-                  <span class="text-xs text-gray-500">مرجع: التسوية الودية - مساند</span>
+                  <strong class="text-blue-900 block">[وقاية النزاعات] بدء إجراءات التسوية الودية خلال 21 يوم عمل من ظهور النزاع</strong>
+                  <p class="check-desc text-xs text-blue-800 mt-1">
+                    وفقاً لآلية التسوية الودية في مساند:
+                    <br>• تُفتح جلسة تسوية ودية عند ظهور أي نزاع عمالي (أجور، حقوق، إنهاء عقد...)
+                    <br>• المدة القصوى للجلسة: 21 يوم عمل من تاريخ رفع النزاع
+                    <br>• في حال التوصل لاتفاق: يُوثق محضر التسوية ويُغلق الملف نهائياً
+                    <br>• في حال عدم الاتفاق: تُحال القضية لمحكمة العمل خلال المهلة النظامية (12 شهر من إنهاء العقد)
+                    <br><span class="text-gray-500">مرجع: آلية التسوية الودية - مساند</span>
+                  </p>
+                  <span class="badge badge-info mt-2">معلومات</span>
                 </label>
-                <span class="badge badge-info">معلومات</span>
               </div>
             </div>
 
@@ -960,11 +570,17 @@
               <div class="flex items-start gap-3">
                 <input type="checkbox" id="ops-10" class="mt-1 w-4 h-4 text-blue-600 rounded" onchange="updateOpsProgress()">
                 <label for="ops-10" class="flex-1 cursor-pointer">
-                  <strong class="text-blue-900 block">[وقاية النزاعات] حفظ محاضر التسوية الموقعة</strong>
-                  <p class="text-xs text-blue-800 mt-1">أرشيف إلكتروني لمحاضر الاتفاق يمنع إعادة رفع النزاع</p>
-                  <span class="text-xs text-gray-500">مرجع: آلية التسوية - مساند</span>
+                  <strong class="text-blue-900 block">[وقاية النزاعات] أرشفة محاضر التسوية الموقعة إلكترونياً</strong>
+                  <p class="check-desc text-xs text-blue-800 mt-1">
+                    لأغراض الوقاية القانونية:
+                    <br>• بعد توقيع محضر التسوية الودية، يجب حفظ نسخة إلكترونية معتمدة في أرشيف آمن
+                    <br>• يمنع هذا الإجراء إعادة رفع نفس النزاع لاحقاً (مبدأ حجية الأمر المقضي)
+                    <br>• يُنصح باستخدام منصة مساند للأرشفة الرسمية أو نظام إدارة العقود الداخلي
+                    <br>• الاحتفاظ بالمحاضر لمدة لا تقل عن 5 سنوات وفقاً لمتطلبات التدقيق
+                    <br><span class="text-gray-500">مرجع: إجراءات الأرشفة - دليل مستخدم مساند</span>
+                  </p>
+                  <span class="badge badge-info mt-2">معلومات</span>
                 </label>
-                <span class="badge badge-info">معلومات</span>
               </div>
             </div>
 
@@ -973,11 +589,17 @@
               <div class="flex items-start gap-3">
                 <input type="checkbox" id="ops-11" class="mt-1 w-4 h-4 text-amber-600 rounded" onchange="updateOpsProgress()">
                 <label for="ops-11" class="flex-1 cursor-pointer">
-                  <strong class="text-amber-900 block">[الأرشفة] تحديث حالة العقد فوراً عند أي تغيير</strong>
-                  <p class="text-xs text-amber-800 mt-1">"تم الوصول"، "مرفوع"، "ملغي" - التحديث الفوري يمنع التعقيدات</p>
-                  <span class="text-xs text-gray-500">مرجع: إدارة العقود - مساند</span>
+                  <strong class="text-amber-900 block">[الأرشفة] تحديث حالة العقد فوراً عند أي تغيير (تم الوصول / مرفوع / ملغي)</strong>
+                  <p class="check-desc text-xs text-amber-800 mt-1">
+                    لأغراض المتابعة النظامية:
+                    <br>• يجب تحديث حالة العقد في النظام خلال 24 ساعة من حدوث أي تغيير
+                    <br>• الحالات الرئيسية: "سار" (قيد التنفيذ)، "تم الوصول" (ناجح)، "مرفوع" (معلق)، "ملغي" (منتهي)
+                    <br>• التحديث الفوري يمنع تعقيدات الإجراءات اللاحقة (تجديد الإقامة، نقل الكفالة...)
+                    <br>• يُربط التحديث تلقائياً بإشعارات صاحب العمل والعامل عبر منصة مساند
+                    <br><span class="text-gray-500">مرجع: إدارة دورة حياة العقد - مساند</span>
+                  </p>
+                  <span class="badge badge-recommended mt-2">موصى به</span>
                 </label>
-                <span class="badge badge-warning">موصى به</span>
               </div>
             </div>
 
@@ -985,17 +607,23 @@
               <div class="flex items-start gap-3">
                 <input type="checkbox" id="ops-12" class="mt-1 w-4 h-4 text-blue-600 rounded" onchange="updateOpsProgress()">
                 <label for="ops-12" class="flex-1 cursor-pointer">
-                  <strong class="text-blue-900 block">[الأرشفة] استخدام المشاركة الإلكترونية لتقديم ملاحظات</strong>
-                  <p class="text-xs text-blue-800 mt-1">قناة رسمية لتحسين الخدمات عبر منصة مساند</p>
-                  <span class="text-xs text-gray-500">مرجع: المشاركة الإلكترونية - مساند</span>
+                  <strong class="text-blue-900 block">[الأرشفة] استخدام قناة "المشاركة الإلكترونية" لتقديم ملاحظات تحسين الخدمة</strong>
+                  <p class="check-desc text-xs text-blue-800 mt-1">
+                    وفقاً لمبدأ التحسين المستمر في مساند:
+                    <br>• توفر المنصة قناة رسمية "المشاركة الإلكترونية" لتلقي ملاحظات المستخدمين
+                    <br>• يمكن من خلالها اقتراح تحسينات، الإبلاغ عن أخطاء، أو طلب توضيحات نظامية
+                    <br>• تُراجع الملاحظات من قبل فريق تطوير مساند وقد تُدرج في تحديثات مستقبلية
+                    <br>• المشاركة الفعالة تساهم في رفع جودة الخدمات الحكومية للجميع
+                    <br><span class="text-gray-500">مرجع: المشاركة الإلكترونية - مركز معرفة مساند</span>
+                  </p>
+                  <span class="badge badge-info mt-2">معلومات</span>
                 </label>
-                <span class="badge badge-info">معلومات</span>
               </div>
             </div>
           </div>
 
           <!-- Progress & Actions -->
-          <div class="bg-gray-50 p-4 rounded-lg border mb-6">
+          <div class="bg-gray-50 p-4 rounded-lg border mb-6 no-print">
             <div class="flex justify-between items-center mb-3">
               <span class="text-sm font-medium text-gray-700">تقدم قائمة اليوم:</span>
               <span class="text-sm font-bold text-emerald-700" id="opsProgressText">0/12</span>
@@ -1005,9 +633,9 @@
             </div>
           </div>
 
-          <div class="flex flex-wrap gap-3">
-            <button onclick="exportChecklistPDF()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition flex items-center justify-center gap-2">
-              <i class="fas fa-file-pdf"></i> تصدير القائمة كـ PDF
+          <div class="flex flex-wrap gap-3 no-print">
+            <button onclick="printChecklist()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition flex items-center justify-center gap-2">
+              <i class="fas fa-print"></i> طباعة القائمة (صفحة واحدة)
             </button>
             <button onclick="resetDailyChecklist()" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-medium py-3 px-4 rounded-lg transition flex items-center justify-center gap-2">
               <i class="fas fa-redo"></i> إعادة تعيين ليوم جديد
@@ -1030,41 +658,168 @@
   </div>
 </footer>
 
-<!-- Print Header (hidden on screen) -->
-<div class="print-only p-8">
-  <div class="text-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">تقرير العمليات اليومية - مساند</h1>
-    <p class="text-gray-600" id="printDate"></p>
+<!-- ============ PRINTABLE CERTIFICATES (Hidden on Screen) ============ -->
+<div class="print-only">
+  <!-- Certificate Template -->
+  <div id="certificate-template" class="certificate-print">
+    <div class="certificate-border">
+      <div class="text-center mb-8">
+        <div class="text-3xl font-bold text-emerald-700 mb-2">🎖️ شهادة إتمام معتمدة</div>
+        <div class="text-xl text-gray-700">منصة مساند الحكومية</div>
+        <div class="text-sm text-gray-500 mt-1">musaned.com.sa</div>
+      </div>
+      
+      <div class="certificate-body">
+        <p>تشهد منصة مساند بأن:</p>
+        <p class="text-2xl font-bold text-gray-900 my-4" id="cert-name">اسم المتدرب</p>
+        <p>قد أتم بنجاح <span id="cert-stage">المرحلة رقم</span> من برنامج التدريب المعتمد:</p>
+        <p class="text-lg font-semibold text-emerald-700 my-2" id="cert-stage-title">عنوان المرحلة</p>
+        <p>وذلك بعد اجتياز الاختبار النهائي بدرجة <span id="cert-score">__/20</span></p>
+      </div>
+
+      <div class="text-center text-sm text-gray-600 my-6">
+        <p>تاريخ الإصدار: <span id="cert-date">__ / __ / ____</span></p>
+        <p>رقم الشهادة: <span id="cert-number">MUSANED-________</span></p>
+        <p class="mt-2 text-xs">للتحقق من صحة الشهادة: musaned.com.sa/verify</p>
+      </div>
+
+      <div class="certificate-signature">
+        <div>
+          <div class="signature-line">توقيع المدرب المعتمد</div>
+        </div>
+        <div>
+          <div class="signature-line">ختم منصة مساند</div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div id="printChecklist"></div>
+
+  <!-- Printable Checklist (Concise) -->
+  <div id="printable-checklist" class="checklist-print">
+    <div class="text-center mb-4">
+      <h2 class="text-xl font-bold">✅ قائمة العمليات اليومية - مساند</h2>
+      <p class="text-sm text-gray-600" id="print-checklist-date"></p>
+    </div>
+    <div id="print-checklist-items" class="text-sm"></div>
+  </div>
 </div>
 
 <!-- JavaScript Logic -->
 <script>
 // ============ CONFIG & STATE ============
-const modules = ['module-welcome', 'module-1', 'module-2', 'module-3', 'module-4', 'module-5', 'module-complete', 'module-ops-checklist'];
-const trainingChecklist = [
-  { id: 'checklist-1', text: 'فهمت عناصر العقد (المادة 8)' },
-  { id: 'checklist-2', text: 'أستطيع التحقق من متطلبات التأشيرة' },
-  { id: 'checklist-3', text: 'أعرف حقوق وواجبات الطرفين (المادتان 15، 16)' },
-  { id: 'checklist-4', text: 'أتقن آلية التسوية الودية' },
-  { id: 'checklist-5', text: 'اجتزت الاختبار النهائي' }
+const stages = [
+  { id: 1, title: 'أساسيات لوائح العمل المنزلي', difficulty: 'مبتدئ', badge: 'stage-1', passScore: 15 },
+  { id: 2, title: 'ضوابط التأشيرات والقدرة المالية', difficulty: 'متوسط', badge: 'stage-2', passScore: 15 },
+  { id: 3, title: 'الحقوق والواجبات والتسوية الودية', difficulty: 'متقدم', badge: 'stage-3', passScore: 15 },
+  { id: 4, title: 'سيناريوهات عملية متقدمة', difficulty: 'خبير', badge: 'stage-4', passScore: 15 }
 ];
-let currentView = 'training'; // 'training' or 'operations'
+
+const quizQuestions = {
+  1: [
+    { q: 'ما الحد الأقصى لفترة التجربة في عقد العمل المنزلي؟', options: ['30 يوم', '60 يوم', '90 يوم', '180 يوم'], a: 2 },
+    { q: 'أي من التالي ليس من عناصر العقد الإلزامية وفق المادة 8؟', options: ['نوع العمل', 'اسم صاحب العمل', 'لون ملابس العامل', 'الأجر وطريقة السداد'], a: 2 },
+    { q: 'ما الحد الأدنى للراحة اليومية للعامل المنزلي؟', options: ['4 ساعات', '6 ساعات', '8 ساعات متصلة', '10 ساعات'], a: 2 },
+    { q: 'متى يستحق العامل إجازة سنوية 30 يوم؟', options: ['بعد سنة', 'بعد سنتين متتاليتين', 'بعد 3 سنوات', 'فور الوصول'], a: 1 },
+    { q: 'ما مدة جلسة التسوية الودية كحد أقصى؟', options: ['7 أيام', '14 يوم', '21 يوم عمل', '30 يوم'], a: 2 },
+    { q: 'هل العقد الشفهي ملزم نظامياً في العمل المنزلي؟', options: ['لا، يجب أن يكون كتابياً', 'نعم، ولكن يحق للعامل طلب نسخه كتابياً', 'نعم، ولا يحق طلب نسخة', 'لا، إلا إذا كان الأجر > 5000 ريال'], a: 1 },
+    { q: 'من يتحمل رسوم التأشيرة والإقامة؟', options: ['العامل', 'صاحب العمل', 'مناصفة', 'الوكالة فقط'], a: 1 },
+    { q: 'ما العقوبة على الاحتفاظ بجواز سفر العامل؟', options: ['إنذار', 'غرامة حتى 2,000 ريال', 'غرامة حتى 20,000 ريال + منع استقدام', 'لا عقوبة'], a: 2 },
+    { q: 'كم ساعة عمل يومية كحد أقصى للعامل المنزلي؟', options: ['8 ساعات', '10 ساعات', '12 ساعة', 'لا حد'], a: 1 },
+    { q: 'ما الذي يجب فعله عند إنهاء العقد من قبل صاحب العمل بعد فترة التجربة؟', options: ['لا شيء', 'إشعار مسبق + تسوية مستحقات خلال أسبوع', 'دفع تعويض شهرين فقط', 'إعادة العامل لبلده فوراً'], a: 1 },
+    { q: 'هل يحق للعامل العمل لدى طرف آخر غير صاحب العقد؟', options: ['نعم، برضا صاحب العمل', 'نعم، دائماً', 'لا، إلا بموافقة خطية من مساند', 'لا، مطلقاً'], a: 3 },
+    { q: 'ما المهلة النظامية لرفع دعوى عمالية بعد إنهاء العقد؟', options: ['3 أشهر', '6 أشهر', '12 شهر', 'لا مهلة'], a: 2 },
+    { q: 'أي من التالي من واجبات العامل وفق المادة 16؟', options: ['الحفاظ على ممتلكات صاحب العمل', 'تحمل رسوم الإقامة', 'توفير السكن', 'دفع بدل النقل'], a: 0 },
+    { q: 'ما الحد الأدنى ليوم الراحة الأسبوعي؟', options: ['12 ساعة', '18 ساعة', '24 ساعة متصلة', 'يومين'], a: 2 },
+    { q: 'هل يحق لصاحب العمل تكليف العامل بعمل خطير؟', options: ['نعم، إذا دفع بدل خطر', 'نعم، في حالات الطوارئ فقط', 'لا، مطلقاً', 'نعم، إذا وافق العامل شفهياً'], a: 2 },
+    { q: 'ما الذي يجب تضمينه في بند الأجر في العقد؟', options: ['المبلغ فقط', 'المبلغ وطريقة السداد وتاريخه', 'المبلغ واسم البنك', 'لا يشترط'], a: 1 },
+    { q: 'من يحق له طلب نسخة مكتوبة من العقد الشفهي؟', options: ['صاحب العمل فقط', 'العامل فقط', 'أي من الطرفين', 'لا يحق لأحد'], a: 2 },
+    { q: 'ما التعويض عند إنهاء العقد غير المبرر من صاحب العمل بعد فترة التجربة؟', options: ['لا تعويض', 'أجر شهر', 'أجر شهرين', 'أجر 3 أشهر'], a: 2 },
+    { q: 'هل يحق للعامل الاحتفاظ بنسخة من العقد؟', options: ['لا', 'نعم، دائماً', 'نعم، إذا دفع رسوماً', 'نعم، بعد سنة من العمل'], a: 1 },
+    { q: 'ما الذي يجب على صاحب العمل توفيره للعامل؟', options: ['تذكرة سفر سنوية', 'سكن مناسب ومأكل أو بدل', 'سيارة خاصة', 'تأمين على الحياة'], a: 1 }
+  ],
+  2: [
+    { q: 'ما الحد الأدنى للراتب للمواطن في الفئة 2 لإصدار تأشيرة عامل منزلي؟', options: ['5,000 ريال', '7,000 ريال', '10,000 ريال', '15,000 ريال'], a: 1 },
+    { q: 'ما الرصيد البنكي المطلوب للمقيم في الفئة 1؟', options: ['50,000 ريال', '100,000 ريال', '200,000 ريال', '500,000 ريال'], a: 1 },
+    { q: 'أي وثيقة مالية غير مقبولة لإثبات القدرة المالية؟', options: ['شهادة تأمينات < 60 يوم', 'كشف حساب بنكي معتمد', 'صورة شاشة تطبيق البنك', 'خطاب جهة عمل حكومي'], a: 2 },
+    { q: 'كم فئة مالية موجودة للمواطنين في جداول مساند؟', options: ['10 فئات', '15 فئة', '20 فئة', '25 فئة'], a: 2 },
+    { q: 'ما الحد الأدنى للراتب لذوي الإعاقة في الفئة 2؟', options: ['3,000 ريال', '5,000 ريال', '7,000 ريال', '10,000 ريال'], a: 1 },
+    { q: 'هل يمكن استخدام محفظة استثمارية كإثبات مالي؟', options: ['لا، مطلقاً', 'نعم، إذا كانت معتمدة وقابلة للتحقق إلكترونياً', 'نعم، لأي قيمة', 'نعم، فقط للمواطنين'], a: 1 },
+    { q: 'ما المدة القصوى لصلاحية شهادة التأمينات لإثبات الدخل؟', options: ['30 يوم', '60 يوم', '90 يوم', '180 يوم'], a: 1 },
+    { q: 'من يتحقق من وثائق القدرة المالية في مساند؟', options: ['صاحب العمل', 'الوكالة', 'النظام آلياً عبر الربط الإلكتروني', 'وزارة الداخلية'], a: 2 },
+    { q: 'ما الذي يحدث إذا لم يستوفِ المقيم الحد الأدنى للراتب؟', options: ['يُرفض الطلب', 'يُقبل مع كفيل إضافي', 'يُقبل برصيد بنكي أعلى', 'أ أو ج'], a: 3 },
+    { q: 'هل يمكن جمع أكثر من مصدر دخل لإثبات القدرة المالية؟', options: ['لا', 'نعم، إذا كانت موثقة وقابلة للتحقق', 'نعم، لأي مصدر', 'نعم، فقط للمواطنين'], a: 1 },
+    { q: 'ما الفرق الرئيسي بين متطلبات المواطنين والمقيمين؟', options: ['لا فرق', 'المقيمون يحتاجون راتب أعلى', 'المواطنون يحتاجون رصيد أعلى', 'المقيمون لا يحتاجون إثبات مالي'], a: 1 },
+    { q: 'ما الذي يجب فعله إذا تغير دخل صاحب العمل بعد إصدار التأشيرة؟', options: ['لا شيء', 'إبلاغ مساند خلال 30 يوم', 'إلغاء التأشيرة', 'دفع غرامة'], a: 1 },
+    { q: 'هل يشترط أن يكون الرصيد البنكي في بنك سعودي؟', options: ['نعم، دائماً', 'لا، أي بنك معتمد', 'نعم، للمقيمين فقط', 'لا، لكن يجب أن يكون قابلاً للتحقق'], a: 3 },
+    { q: 'ما العقوبة على تقديم وثائق مالية مزورة؟', options: ['إنذار', 'غرامة + منع استقدام', 'سجن', 'لا عقوبة'], a: 1 },
+    { q: 'كم عدد الفئات المالية لذوي الإعاقة؟', options: ['3 فئات', '5 فئات', '10 فئات', '20 فئة'], a: 0 },
+    { q: 'ما الذي يميز فئة "الراتب فقط" للمواطنين؟', options: ['لا تحتاج رصيد بنكي', 'تحتاج رصيد 40,000 ريال', 'للمتقاعدين فقط', 'للوظائف الحكومية فقط'], a: 1 },
+    { q: 'هل يمكن استخدام دخل الزوجة لإثبات قدرة الزوج المالية؟', options: ['لا', 'نعم، إذا كانت مضافة في نفس الحساب', 'نعم، دائماً', 'نعم، للمقيمين فقط'], a: 1 },
+    { q: 'ما المدة التي يجب أن يكون فيها الرصيد البنكي مستقراً؟', options: ['يوم واحد', 'أسبوع', 'شهر', 'لا شرط'], a: 3 },
+    { q: 'ما الذي يحدث إذا انخفض الرصيد بعد إصدار التأشيرة؟', options: ['تُلغى التأشيرة', 'لا تأثير', 'يُطلب إثبات جديد', 'يُفرض غرامة'], a: 1 },
+    { q: 'أي من التالي صحيح بخصوص التحقق الإلكتروني؟', options: ['اختياري', 'إلزامي لجميع الوثائق المالية', 'للمقيمين فقط', 'للمواطنين فقط'], a: 1 }
+  ],
+  3: [
+    { q: 'ما الإجراء الصحيح إذا طلب العامل يوم راحة إضافي غير متفق عليه؟', options: ['الرفض فوراً', 'القبول دون مقابل', 'التفاوض ووثق الاتفاق كتابياً', 'إبلاغ مساند'], a: 2 },
+    { q: 'في حالة نزاع على الأجر، ما أول خطوة وفق مساند؟', options: ['رفع دعوى قضائية', 'التسوية الودية', 'إبلاغ الشرطة', 'إنهاء العقد'], a: 1 },
+    { q: 'ما الذي يجب فعله إذا مرض العامل لأكثر من 15 يوم؟', options: ['إنهاء العقد', 'صرف نصف الأجر للأيام 16-30 مع تقرير طبي', 'صرف الأجر كاملاً', 'لا شيء'], a: 1 },
+    { q: 'هل يحق لصاحب العمل خصم من الأجر مقابل تلف ممتلكات؟', options: ['نعم، دائماً', 'نعم، إذا أثبت الإهمال وبحد أقصى أجر يوم', 'لا، مطلقاً', 'نعم، بموافقة العامل فقط'], a: 1 },
+    { q: 'ما الإجراء عند رغبة العامل في إنهاء العقد خلال فترة التجربة؟', options: ['لا يحق له', 'يحق له دون تعويض مع إشعار 3 أيام', 'يحق له مع دفع تعويض', 'يحتاج موافقة مساند'], a: 1 },
+    { q: 'في حالة عدم دفع الأجر في موعده، ما حق العامل؟', options: ['العمل نصف يوم', 'التوقف عن العمل بعد إشعار', 'رفع دعوى فوراً', 'لا حق له'], a: 1 },
+    { q: 'ما الذي يجب توثيقه عند منح إجازة للعامل؟', options: ['لا شيء', 'التاريخ والمدة فقط', 'التاريخ والمدة وسبب الإجازة', 'التاريخ والمدة وتوقيع الطرفين'], a: 3 },
+    { q: 'هل يحق لصاحب العمل تغيير مهنة العامل المتفق عليها في العقد؟', options: ['نعم، دائماً', 'نعم، إذا دفع فرق الأجر', 'لا، إلا بتعديل العقد وموافقة العامل', 'نعم، إذا كانت المهنة الجديدة أسهل'], a: 2 },
+    { q: 'ما الإجراء الصحيح إذا أراد العامل زيارة بلده خلال العقد؟', options: ['الرفض', 'القبول مع خصم الأجر', 'التفاوض على إجازة غير مدفوعة أو مدفوعة حسب الاتفاق', 'إبلاغ السفارة'], a: 2 },
+    { q: 'في حالة وفاة صاحب العمل، ما مصير عقد العامل؟', options: ['ينتهي فوراً', 'ينتقل للورثة مع نفس الشروط', 'يحتاج عقد جديد', 'يعود العامل لبلده'], a: 1 },
+    { q: 'ما الذي يجب فعله إذا فقد العامل جواز سفره؟', options: ['الاحتفاظ به حتى يُستخرج جديد', 'مساعدة العامل في إجراءات الاستخراج وتوثيق ذلك', 'خصم تكلفة الاستخراج من أجره', 'إنهاء العقد'], a: 1 },
+    { q: 'هل يحق للعامل رفض عمل لا يتعلق بمهنته المتفق عليها؟', options: ['لا', 'نعم، إذا كان العمل خطيراً أو غير أخلاقي', 'نعم، لأي عمل', 'نعم، بعد سنة من العمل'], a: 1 },
+    { q: 'ما الإجراء عند وجود خلاف على ساعات العمل الإضافي؟', options: ['دفع ضعف الأجر للساعات الزائدة', 'الرجوع لنص العقد والاتفاق المكتوب', 'رفع دعوى فوراً', 'إنهاء العقد'], a: 1 },
+    { q: 'في حالة نقل العامل لمنزل آخر لنفس صاحب العمل، ما الإجراء؟', options: ['لا شيء', 'تعديل العنوان في العقد وإشعار العامل', 'عقد جديد', 'موافقة مساند'], a: 1 },
+    { q: 'ما الذي يجب توثيقه عند منح مكافأة للعامل؟', options: ['لا شيء', 'المبلغ فقط', 'المبلغ والسبب والتاريخ', 'المبلغ والسبب والتاريخ وتوقيع الطرفين'], a: 3 },
+    { q: 'هل يحق لصاحب العمل منع العامل من التواصل مع عائلته؟', options: ['نعم، لأسباب أمنية', 'لا، مطلقاً', 'نعم، في أوقات العمل فقط', 'نعم، إذا كان العامل قاصراً'], a: 1 },
+    { q: 'ما الإجراء الصحيح إذا أراد العامل تغيير صاحب العمل (نقل كفالة)؟', options: ['موافقة صاحب العمل الحالي + إجراءات مساند', 'موافقة العامل فقط', 'موافقة السفارة', 'لا يجوز'], a: 0 },
+    { q: 'في حالة إنهاء العقد بالتراضي، ما الذي يجب توثيقه؟', options: ['لا شيء', 'تاريخ الإنهاء فقط', 'محضر تسوية موقع من الطرفين', 'إشعار مساند فقط'], a: 2 },
+    { q: 'ما الذي يجب فعله إذا اشتكى العامل من ظروف السكن؟', options: ['الرفض', 'التحقق وتحسين الظروف أو توفير بدل', 'إنهاء العقد', 'إبلاغ البلدية'], a: 1 },
+    { q: 'هل يحق للعامل الاحتفاظ بأجره لدى صاحب العمل كـ "توفير"؟', options: ['نعم، دائماً', 'نعم، إذا وافق كتابياً', 'لا، يجب صرف الأجر كاملاً في موعده', 'نعم، للعمال من جنسيات معينة'], a: 2 }
+  ],
+  4: [
+    { q: 'في سيناريو: عقد "سار" منذ 100 يوم دون تحديث "تم الوصول"، ما الإجراء العاجل؟', options: ['لا شيء', 'تحديث الحالة فوراً مع توثيق سبب التأخير', 'إلغاء العقد', 'رفع نزاع'], a: 1 },
+    { q: 'إذا قدم صاحب العمل وثيقة بنكية برصيد 95,000 ريال (المطلوب 100,000) لمقيم، ما الحل النظامي؟', options: ['رفض الطلب', 'قبول مع تعهد بزيادة الرصيد خلال 30 يوم', 'قبول إذا كان الراتب أعلى من الحد الأدنى', 'طلب وثيقة إضافية مكملة'], a: 3 },
+    { q: 'في حالة نزاع على "فترة الراحة اليومية" دون وجود بند في العقد، ما المرجع النظامي؟', options: ['الاتفاق الشفهي', 'الحد الأدنى النظامي (8 ساعات)', 'عرف المهنة', 'قرار المحكمة فقط'], a: 1 },
+    { q: 'إذا أراد صاحب العمل إنهاء عقد عامل بعد 18 شهر من الخدمة دون سبب، ما التعويض المستحق؟', options: ['لا تعويض', 'أجر شهر', 'أجر شهرين', 'أجر 4.5 أشهر (1.5 شهر لكل سنتين)'], a: 2 },
+    { q: 'في سيناريو: عامل يطلب إجازة مرضية 25 يوم بدون تقرير طبي، ما الإجراء الصحيح؟', options: ['قبول الطلب', 'رفض الطلب وطلب تقرير طبي معتمد', 'صرف نصف الأجر', 'إنهاء العقد'], a: 1 },
+    { q: 'إذا اكتُشف أن وثيقة التأمينات المقدمة مزورة بعد إصدار التأشيرة، ما الإجراء؟', options: ['لا شيء', 'إلغاء التأشيرة + غرامة + منع استقدام', 'طلب وثيقة صحيحة', 'إنذار فقط'], a: 1 },
+    { q: 'في حالة رغبة العامل في إنهاء العقد بعد 3 سنوات لأسباب شخصية، ما الإجراءات؟', options: ['لا يحق له', 'إشعار مسبق + تعويض صاحب العمل إذا نص العقد', 'إنهاء فوري', 'موافقة مساند فقط'], a: 1 },
+    { q: 'إذا تغير دخل صاحب العمل من 15,000 إلى 8,000 ريال بعد إصدار تأشيرة مقيم، ما التأثير؟', options: ['لا تأثير على التأشيرة الصادرة', 'إلغاء التأشيرة', 'طلب إثبات مالي جديد', 'غرامة'], a: 0 },
+    { q: 'في سيناريو: نزاع على "أجر إضافي" لم يرد في العقد، ما المرجع؟', options: ['الاتفاق الشفهي', 'نص العقد فقط', 'الحدود النظامية للعمل الإضافي', 'قرار التسوية الودية'], a: 2 },
+    { q: 'إذا أراد صاحب العمل نقل العامل لمنزل في مدينة أخرى، ما الإجراء؟', options: ['لا شيء', 'موافقة العامل + تعديل العقد + تغطية تكاليف الانتقال', 'عقد جديد', 'موافقة مساند فقط'], a: 1 },
+    { q: 'في حالة وفاة العامل، ما مستندات إنهاء العقد المطلوبة؟', options: ['لا شيء', 'شهادة الوفاة + محضر تسوية مع الورثة', 'إشعار السفارة', 'قرار محكمة'], a: 1 },
+    { q: 'إذا قدم عامل شكوى بأن صاحب العمل يمنعه من التواصل مع سفارته، ما الإجراء النظامي؟', options: ['لا إجراء', 'تحقيق + غرامة على صاحب العمل إذا ثبت', 'نقل الكفالة فوراً', 'إنهاء العقد'], a: 1 },
+    { q: 'في سيناريو: عقد "مرفوع" منذ 45 يوم، ما الإجراء؟', options: ['لا شيء', 'مراجعة سبب التعليق ومعالجته أو الإلغاء', 'تحويله لـ "ملغي" تلقائياً', 'رفع نزاع'], a: 1 },
+    { q: 'إذا اختلف الطرفان على "تاريخ الوصول" الفعلي، ما المرجع؟', options: ['تأشيرة الدخول', 'تذكرة الطيران', 'إقرار العامل', 'قرار التسوية الودية'], a: 0 },
+    { q: 'في حالة رغبة صاحب العمل في استقدام بديل لعامل "ملغي"، ما الشرط؟', options: ['لا شرط', 'انتظار 30 يوم', 'معالجة سبب الإلغاء أولاً', 'موافقة خاصة'], a: 2 },
+    { q: 'إذا اكتُشف أن العامل يعمل لدى طرف ثالث غير صاحب العقد، ما الإجراء؟', options: ['لا شيء', 'إنذار + غرامة على العامل + احتمال منع من العمل', 'نقل الكفالة', 'إنهاء العقد فقط'], a: 1 },
+    { q: 'في سيناريو: نزاع على "بدل سكن" غير منصوص في العقد، ما الحل؟', options: ['الرجوع للاتفاق الشفهي', 'الحد الأدنى النظامي (توفير سكن أو بدل)', 'قرار المحكمة فقط', 'إسقاط المطالبة'], a: 1 },
+    { q: 'إذا أراد صاحب العمل إنهاء عقد عامل خلال فترة التجربة بعد 85 يوم، ما الإجراء؟', options: ['لا يحق', 'يحق دون تعويض مع إشعار', 'يحق مع تعويض نصف شهر', 'يحتاج موافقة مساند'], a: 1 },
+    { q: 'في حالة تقديم وثيقة بنكية من بنك غير معتمد إلكترونياً، ما الحل؟', options: ['رفض الوثيقة', 'قبول مع تصديق من السفارة', 'طلب وثيقة من بنك معتمد', 'قبول مع تعهد'], a: 2 },
+    { q: 'إذا اختلف الطرفان على "سبب إنهاء العقد"، ما المرجع في التسوية الودية؟', options: ['نص العقد', 'الإثباتات المقدمة', 'العرف', 'قرار الوسيط'], a: 1 }
+  ]
+};
+
+let currentView = 'training';
 let currentModule = 'module-welcome';
-let quizScore = 0;
+let stageScores = {};
+let unlockedStages = [1];
 
 // ============ INIT ============
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('currentDate').textContent = new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  document.getElementById('printDate').textContent = document.getElementById('currentDate').textContent;
-  document.getElementById('certificateDate').textContent = new Date().toLocaleDateString('ar-SA');
-  document.getElementById('certNumber').textContent = Math.random().toString(36).substr(2, 8).toUpperCase();
+  document.getElementById('print-checklist-date').textContent = document.getElementById('currentDate').textContent;
   
+  renderStageProgress();
   renderModulesNav();
-  renderTrainingChecklist();
+  initQuizzes();
   loadAllProgress();
-  updateOpsProgress();
+  updateOverallProgress();
 });
 
 // ============ VIEW TOGGLE ============
@@ -1076,16 +831,15 @@ function toggleView() {
   document.getElementById('opsNav').classList.toggle('hidden', currentView === 'training');
   document.getElementById('viewToggleText').textContent = currentView === 'training' ? 'عرض العمليات' : 'عرض التدريب';
   
-  // Update mobile tabs
   document.getElementById('tab-training').classList.toggle('active', currentView === 'training');
   document.getElementById('tab-training').classList.toggle('text-gray-700', currentView === 'training');
-  document.getElementById('tab-training').classList.toggle('border-blue-600', currentView === 'training');
+  document.getElementById('tab-training').classList.toggle('border-emerald-600', currentView === 'training');
   document.getElementById('tab-training').classList.toggle('text-gray-500', currentView === 'operations');
   document.getElementById('tab-training').classList.toggle('border-transparent', currentView === 'operations');
   
   document.getElementById('tab-operations').classList.toggle('active', currentView === 'operations');
   document.getElementById('tab-operations').classList.toggle('text-gray-700', currentView === 'operations');
-  document.getElementById('tab-operations').classList.toggle('border-blue-600', currentView === 'operations');
+  document.getElementById('tab-operations').classList.toggle('border-emerald-600', currentView === 'operations');
   document.getElementById('tab-operations').classList.toggle('text-gray-500', currentView === 'training');
   document.getElementById('tab-operations').classList.toggle('border-transparent', currentView === 'training');
 }
@@ -1097,20 +851,20 @@ function switchTab(view) {
   }
 }
 
-// ============ TRAINING NAVIGATION ============
+// ============ NAVIGATION ============
 function showModule(moduleId) {
-  document.querySelectorAll('.module-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.module-content').forEach(el => {
+    el.classList.remove('active');
+    el.classList.remove('certificate-print');
+  });
   document.getElementById(moduleId).classList.add('active');
   currentModule = moduleId;
-  updateTrainingProgress();
-  renderModulesNav();
+  updateOverallProgress();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function nextModule(nextId) {
-  const currentIndex = modules.indexOf(currentModule);
-  const nextIndex = modules.indexOf(nextId);
-  if (nextIndex > currentIndex) showModule(nextId);
+  showModule(nextId);
 }
 
 function prevModule(prevId) {
@@ -1121,130 +875,145 @@ function renderModulesNav() {
   const nav = document.getElementById('modulesNav');
   const labels = {
     'module-welcome': '🏠 المقدمة',
-    'module-1': '📜 لوائح العمل',
-    'module-2': '💰 ضوابط التأشيرة',
-    'module-3': '⚖️ الحقوق والواجبات',
-    'module-4': '🔄 التسوية الودية',
-    'module-5': '🎯 الاختبار النهائي'
+    'module-stage1': '📘 المرحلة 1',
+    'module-stage2': '📗 المرحلة 2',
+    'module-stage3': '📙 المرحلة 3',
+    'module-stage4': '📕 المرحلة 4',
+    'module-complete': '🎓 الإنجاز'
   };
   
-  nav.innerHTML = modules.slice(0, -1).filter(id => id !== 'module-ops-checklist').map((id, index) => {
+  nav.innerHTML = Object.keys(labels).map(id => {
     const isActive = id === currentModule && currentView === 'training';
-    const isCompleted = (modules.indexOf(currentModule) > index && currentView === 'training') || 
-                        (id === 'module-complete' && currentModule === 'module-complete');
+    const isLocked = id.startsWith('module-stage') && !unlockedStages.includes(parseInt(id.split('stage')[1]));
     return `
-      <button onclick="showModule('${id}')" 
+      <button onclick="${isLocked ? '' : `showModule('${id}')`}" 
         class="w-full text-right p-3 rounded-lg transition flex items-center gap-3 ${
-          isActive ? 'bg-blue-100 text-blue-800 font-bold border-r-4 border-blue-600' : 
-          isCompleted ? 'text-green-700 hover:bg-green-50' : 'text-gray-600 hover:bg-gray-50'
+          isActive ? 'bg-emerald-100 text-emerald-800 font-bold border-r-4 border-emerald-600' : 
+          isLocked ? 'text-gray-400 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-50'
         }">
-        <span class="step-indicator text-xs ${isActive ? 'active' : isCompleted ? 'completed' : ''}">${index + 1}</span>
-        <span class="text-sm">${labels[id] || id}</span>
+        <span class="step-indicator text-xs ${isActive ? 'active' : isLocked ? 'locked' : 'completed'}">
+          ${isLocked ? '<i class="fas fa-lock"></i>' : id.replace('module-', '').replace('stage', '')}
+        </span>
+        <span class="text-sm">${labels[id]}</span>
       </button>
     `;
   }).join('');
 }
 
-// ============ TRAINING CHECKLIST ============
-function renderTrainingChecklist() {
-  // Implementation similar to original, using localStorage
+function renderStageProgress() {
+  const container = document.getElementById('stageProgress');
+  container.innerHTML = stages.map(stage => {
+    const isUnlocked = unlockedStages.includes(stage.id);
+    const isCompleted = stageScores[stage.id] >= stage.passScore;
+    return `
+      <div class="p-3 rounded-lg border ${isCompleted ? 'bg-green-50 border-green-200' : isUnlocked ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'}">
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-medium text-sm">المرحلة ${stage.id}</span>
+          <span class="stage-badge ${stage.badge}">${stage.difficulty}</span>
+        </div>
+        <div class="text-xs ${isCompleted ? 'text-green-700' : isUnlocked ? 'text-blue-700' : 'text-gray-500'}">
+          ${isCompleted ? '✅ مكتملة' : isUnlocked ? '🔓 متاح' : '🔒 مقفل'}
+        </div>
+        ${stageScores[stage.id] !== undefined ? `<div class="text-xs mt-1">الدرجة: ${stageScores[stage.id]}/20</div>` : ''}
+      </div>
+    `;
+  }).join('');
 }
 
-function markChecklist(id) {
-  const saved = JSON.parse(localStorage.getItem('musanedTraining') || '{}');
-  saved[id] = true;
-  localStorage.setItem('musanedTraining', JSON.stringify(saved));
-  updateTrainingProgress();
+// ============ QUIZ SYSTEM ============
+function initQuizzes() {
+  stages.forEach(stage => {
+    const container = document.getElementById(`quiz-stage${stage.id}-container`);
+    container.innerHTML = quizQuestions[stage.id].map((q, idx) => `
+      <div class="quiz-question p-4 border rounded-lg bg-gray-50">
+        <p class="font-medium text-gray-800 mb-3">${idx + 1}. ${q.q}</p>
+        <div class="space-y-2">
+          ${q.options.map((opt, optIdx) => `
+            <label class="quiz-option flex items-center gap-2 p-2 border rounded cursor-pointer" onclick="selectOption(this, 's${stage.id}q${idx}')">
+              <input type="radio" name="s${stage.id}q${idx}" value="${optIdx}" class="quiz-radio hidden">
+              <span>${opt}</span>
+            </label>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  });
 }
 
-function updateTrainingProgress() {
-  const saved = JSON.parse(localStorage.getItem('musanedTraining') || '{}');
-  const checked = trainingChecklist.filter(item => saved[item.id]).length;
-  const percent = Math.round((checked / trainingChecklist.length) * 100);
-  document.getElementById('progressBar').style.width = `${percent}%`;
-  document.getElementById('progressPercent').textContent = `${percent}%`;
+function selectOption(label, name) {
+  // Remove selection from siblings
+  label.parentElement.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected'));
+  // Add selection to clicked
+  label.classList.add('selected');
+  // Check the radio
+  label.querySelector('.quiz-radio').checked = true;
 }
 
-function loadAllProgress() {
-  updateTrainingProgress();
-}
-
-// ============ EXERCISES ============
-function checkEx1() {
-  const ans = document.querySelector('input[name="ex1"]:checked')?.value;
-  const feedback = document.getElementById('ex1-feedback');
-  if (ans === 'b') {
-    feedback.textContent = '✅ صحيح! يجب تعديل العقد لإضافة بند الراحة (8 ساعات) وفق نظام مساند.';
-    feedback.className = 'mt-2 text-sm font-medium text-green-700';
-    markChecklist('checklist-1');
-  } else {
-    feedback.textContent = '❌ الإجابة الصحيحة: طلب تعديل العقد لإضافة بند الراحة (8 ساعات). المادة 8 تلزم بتوضيح شروط العمل.';
-    feedback.className = 'mt-2 text-sm font-medium text-red-700';
-  }
-  feedback.classList.remove('hidden');
-}
-
-function checkScenario(answer) {
-  const feedback = document.getElementById('scenario-feedback');
-  if (answer === 'yes') {
-    feedback.textContent = '✅ صحيح! المقيم براتب 15,000 ريال يستوفي الفئة 1 (الحد الأدنى 10,000 ريال) وفق جداول مساند.';
-    feedback.className = 'mt-2 text-sm font-medium text-green-700';
-  } else {
-    feedback.textContent = '❌ الإجابة الصحيحة: نعم، يستوفي. الفئة 1 للمقيمين تتطلب راتب ≥10,000 ريال.';
-    feedback.className = 'mt-2 text-sm font-medium text-red-700';
-  }
-  feedback.classList.remove('hidden');
-}
-
-// ============ QUIZ ============
-function submitQuiz() {
-  const answers = { q1: 'c', q2: 'b', q3: 'c', q4: 'c', q5: 'b' };
+function submitStage(stageNum) {
+  const questions = quizQuestions[stageNum];
   let score = 0;
-  for (let q in answers) {
-    const selected = document.querySelector(`input[name="${q}"]:checked`);
-    if (selected && selected.value === answers[q]) score++;
-  }
-  quizScore = score;
-  const resultDiv = document.getElementById('quiz-result');
-  const submitBtn = document.getElementById('submitQuizBtn');
-  const restartBtn = document.getElementById('restartQuizBtn');
   
-  if (score >= 4) {
+  questions.forEach((q, idx) => {
+    const selected = document.querySelector(`input[name="s${stageNum}q${idx}"]:checked`);
+    if (selected && parseInt(selected.value) === q.a) score++;
+  });
+  
+  stageScores[stageNum] = score;
+  const resultDiv = document.getElementById(`quiz-stage${stageNum}-result`);
+  const submitBtn = document.getElementById(`submitStage${stageNum}`);
+  const restartBtn = document.getElementById(`restartStage${stageNum}`);
+  const stage = stages.find(s => s.id === stageNum);
+  
+  if (score >= stage.passScore) {
     resultDiv.className = 'mt-6 p-4 rounded-lg text-center bg-green-100 border border-green-300';
-    resultDiv.innerHTML = `<h4 class="font-bold text-green-900 text-lg mb-2">🎉 نجحت!</h4><p class="text-green-800">درجتك: ${score}/5</p>`;
+    resultDiv.innerHTML = `
+      <h4 class="font-bold text-green-900 text-lg mb-2">🎉 مبروك! نجحت في ${stage.title}</h4>
+      <p class="text-green-800">درجتك: ${score}/20 (${Math.round(score/20*100)}%)</p>
+      <p class="text-sm text-green-700 mt-1">تم فتح المرحلة التالية</p>
+    `;
+    
+    // Unlock next stage
+    if (stageNum < 4 && !unlockedStages.includes(stageNum + 1)) {
+      unlockedStages.push(stageNum + 1);
+      renderStageProgress();
+      renderModulesNav();
+    }
+    
+    // Show completion if all stages done
+    if (stageNum === 4 || Object.keys(stageScores).length === 4) {
+      setTimeout(() => showModule('module-complete'), 2500);
+    }
+    
     submitBtn.classList.add('hidden');
     restartBtn.classList.add('hidden');
-    markChecklist('checklist-5');
-    setTimeout(() => {
-      document.getElementById('certificateName').textContent = 'المتدرب المعتمد';
-      showModule('module-complete');
-    }, 2500);
+    
   } else {
     resultDiv.className = 'mt-6 p-4 rounded-lg text-center bg-red-100 border border-red-300';
-    resultDiv.innerHTML = `<h4 class="font-bold text-red-900 text-lg mb-2">⚠️ حاول مرة أخرى</h4><p class="text-red-800">درجتك: ${score}/5 (المطلوب 4/5)</p>`;
+    resultDiv.innerHTML = `
+      <h4 class="font-bold text-red-900 text-lg mb-2">⚠️ لم تنجح هذه المرة</h4>
+      <p class="text-red-800">درجتك: ${score}/20 (المطلوب ${stage.passScore}/20)</p>
+      <p class="text-sm text-red-700 mt-1">راجع المادة ثم حاول مرة أخرى</p>
+    `;
     submitBtn.classList.add('hidden');
     restartBtn.classList.remove('hidden');
   }
+  
   resultDiv.classList.remove('hidden');
+  saveProgress();
+  updateOverallProgress();
 }
 
-function restartQuiz() {
-  document.querySelectorAll('.quiz-radio').forEach(r => r.checked = false);
-  document.getElementById('quiz-result').classList.add('hidden');
-  document.getElementById('submitQuizBtn').classList.remove('hidden');
-  document.getElementById('restartQuizBtn').classList.add('hidden');
+function restartStage(stageNum) {
+  // Clear selections
+  document.querySelectorAll(`[name^="s${stageNum}q"]`).forEach(r => r.checked = false);
+  document.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected'));
+  // Reset UI
+  document.getElementById(`quiz-stage${stageNum}-result`).classList.add('hidden');
+  document.getElementById(`submitStage${stageNum}`).classList.remove('hidden');
+  document.getElementById(`restartStage${stageNum}`).classList.add('hidden');
 }
 
-// Quiz styling
-document.querySelectorAll('.quiz-option').forEach(opt => {
-  opt.addEventListener('click', function(e) {
-    if (e.target.tagName !== 'INPUT') this.querySelector('.quiz-radio').checked = true;
-    this.parentElement.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
-    this.classList.add('selected');
-  });
-});
-
-// ============ OPERATIONS CHECKLIST ============
+// ============ CHECKLIST ============
 function filterChecklist(category) {
   document.querySelectorAll('.ops-checklist .check-item').forEach(item => {
     if (category === 'all' || item.dataset.category === category) {
@@ -1264,17 +1033,10 @@ function updateOpsProgress() {
   document.getElementById('opsProgressText').textContent = `${checked}/${total}`;
   document.getElementById('opsProgressBar').style.width = `${percent}%`;
   
-  // Save to localStorage
+  // Save
   const saved = JSON.parse(localStorage.getItem('musanedOpsDaily') || '{}');
   checkboxes.forEach(cb => saved[cb.id] = cb.checked);
   localStorage.setItem('musanedOpsDaily', JSON.stringify(saved));
-  
-  // Update dashboard stats
-  const mandatory = Array.from(document.querySelectorAll('.check-item.mandatory input')).filter(cb => cb.checked).length;
-  const recommended = Array.from(document.querySelectorAll('.check-item.recommended input')).filter(cb => cb.checked).length;
-  document.getElementById('contractsReviewed').textContent = `${mandatory}/6`;
-  document.getElementById('statusesUpdated').textContent = `${recommended}/4`;
-  document.getElementById('violationsResolved').textContent = `${checked}/12`;
 }
 
 function resetDailyChecklist() {
@@ -1293,30 +1055,27 @@ function loadOpsChecklist() {
   updateOpsProgress();
 }
 
-// ============ EXPORT FUNCTIONS ============
-function exportChecklistPDF() {
-  // Prepare print content
-  const container = document.getElementById('opsChecklistContainer');
-  const printContainer = document.getElementById('printChecklist');
+// ============ PRINT FUNCTIONS ============
+function printChecklist() {
+  // Build concise print version
+  const items = document.querySelectorAll('#opsChecklistContainer .check-item');
+  const printContainer = document.getElementById('print-checklist-items');
   printContainer.innerHTML = '';
   
-  Array.from(container.children).forEach(item => {
+  items.forEach((item, idx) => {
     const checkbox = item.querySelector('input[type="checkbox"]');
-    const label = item.querySelector('label');
-    const badge = item.querySelector('.badge');
+    const label = item.querySelector('label strong').textContent;
+    const category = item.dataset.category;
+    const icon = category === 'mandatory' ? '⚠️' : category === 'recommended' ? '💡' : 'ℹ️';
     
     const div = document.createElement('div');
-    div.className = 'mb-4 p-3 border rounded';
+    div.className = 'check-item flex items-center gap-2';
     div.innerHTML = `
-      <div class="flex items-center gap-2 mb-1">
-        <span class="w-4 h-4 border rounded flex items-center justify-center ${checkbox.checked ? 'bg-emerald-600 text-white' : ''}">
-          ${checkbox.checked ? '✓' : ''}
-        </span>
-        <strong class="text-gray-900">${label.querySelector('strong').textContent}</strong>
-        <span class="text-xs px-2 py-0.5 rounded ${badge.className}">${badge.textContent}</span>
-      </div>
-      <p class="text-sm text-gray-700 mr-6">${label.querySelector('p').textContent}</p>
-      <p class="text-xs text-gray-500 mr-6 mt-1">${label.querySelector('.text-gray-500').textContent}</p>
+      <span class="w-4 h-4 border rounded flex items-center justify-center text-xs ${checkbox.checked ? 'bg-emerald-600 text-white' : ''}">
+        ${checkbox.checked ? '✓' : ''}
+      </span>
+      <span class="flex-1">${idx + 1}. ${label}</span>
+      <span class="text-xs">${icon}</span>
     `;
     printContainer.appendChild(div);
   });
@@ -1324,16 +1083,60 @@ function exportChecklistPDF() {
   window.print();
 }
 
-function generateDailyReport() {
-  const date = new Date().toLocaleDateString('ar-SA');
-  const checked = document.querySelectorAll('#opsChecklistContainer input:checked').length;
-  const total = document.querySelectorAll('#opsChecklistContainer input').length;
+function printCertificate(stageNum) {
+  const stage = stages.find(s => s.id === stageNum);
+  const score = stageScores[stageNum] || 0;
   
-  alert(`📊 تقرير يومي - مساند\nتاريخ: ${date}\n\n✅ العناصر المكتملة: ${checked}/${total}\n📈 نسبة الإنجاز: ${Math.round(checked/total*100)}%\n\nتم حفظ التقرير في سجل العمليات.`);
+  document.getElementById('cert-name').textContent = 'اسم المتدرب';
+  document.getElementById('cert-stage').textContent = `المرحلة ${stageNum}`;
+  document.getElementById('cert-stage-title').textContent = stage.title;
+  document.getElementById('cert-score').textContent = `${score}/20`;
+  document.getElementById('cert-date').textContent = new Date().toLocaleDateString('ar-SA');
+  document.getElementById('cert-number').textContent = `MUSANED-STG${stageNum}-${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
+  
+  // Hide all modules, show only certificate
+  document.querySelectorAll('.module-content').forEach(el => {
+    el.classList.remove('active');
+    if (el.id === 'certificate-template') {
+      el.classList.add('certificate-print', 'active');
+    }
+  });
+  
+  window.print();
+  
+  // Restore view after print
+  setTimeout(() => {
+    document.querySelectorAll('.module-content').forEach(el => {
+      el.classList.remove('certificate-print');
+      if (el.id === currentModule) el.classList.add('active');
+    });
+  }, 1000);
 }
 
-// Initialize ops checklist
-loadOpsChecklist();
+// ============ PROGRESS ============
+function saveProgress() {
+  localStorage.setItem('musanedStages', JSON.stringify({ unlockedStages, stageScores }));
+}
+
+function loadAllProgress() {
+  const saved = JSON.parse(localStorage.getItem('musanedStages') || '{}');
+  if (saved.unlockedStages) unlockedStages = saved.unlockedStages;
+  if (saved.stageScores) stageScores = saved.stageScores;
+  
+  renderStageProgress();
+  renderModulesNav();
+  loadOpsChecklist();
+  updateOverallProgress();
+}
+
+function updateOverallProgress() {
+  const completed = Object.values(stageScores).filter(s => s >= 15).length;
+  const total = 4;
+  const percent = Math.round((completed / total) * 100);
+  
+  document.getElementById('overallProgressBar').style.width = `${percent}%`;
+  document.getElementById('overallProgress').textContent = `${percent}%`;
+}
 </script>
 
 </body>
